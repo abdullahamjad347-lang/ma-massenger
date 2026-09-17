@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-950 text-gray-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MA Messenger - Powered by MA productions</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        waDark: '#0b141a',
+                        waPanel: '#111b21',
+                        waCard: '#202c33',
+                        waIncoming: '#202c33',
+                        waOutgoing: '#005c4b',
+                        waGreen: '#00a884',
+                        waAccent: '#25d366',
+                        waHeader: '#202c33',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        .chat-bg {
+            background-color: #0b141a;
+            background-image: radial-gradient(#1f2c34 1px, transparent 0);
+            background-size: 18px 18px;
+        }
+        @keyframes storyBar {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+        .story-progress-active {
+            animation: storyBar 5s linear forwards;
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col font-sans select-none overflow-hidden bg-waDark">
+
+    <!-- 1. SPLASH SCREEN -->
+    <div id="splashScreen" class="fixed inset-0 z-50 bg-black flex flex-col items-center justify-between py-16 px-4 transition-opacity duration-700">
+        <div></div>
+        <div class="flex flex-col items-center animate-pulse">
+            <div class="w-24 h-24 rounded-3xl bg-gradient-to-tr from-emerald-600 via-waGreen to-teal-400 flex items-center justify-center shadow-2xl shadow-emerald-950 mb-6 border border-emerald-500/30">
+                <i class="fa-brands fa-whatsapp text-6xl text-white"></i>
+            </div>
+            <h1 class="text-3xl font-extrabold tracking-wider text-white">MA Messenger</h1>
+            <p class="text-xs text-emerald-400 mt-2 font-medium tracking-widest uppercase bg-emerald-950/60 px-3 py-1 rounded-full border border-emerald-500/30">Private Group Chat Network</p>
+        </div>
+        <div class="flex flex-col items-center">
+            <p class="text-[10px] uppercase tracking-widest text-gray-500 mb-1 font-mono">POWERED BY</p>
+            <p class="text-lg font-bold text-emerald-400 tracking-widest drop-shadow-[0_0_10px_rgba(0,168,132,0.5)]">MA PRODUCTIONS</p>
+        </div>
+    </div>
+
+    <!-- 2. SECRET CODE VERIFICATION SCREEN -->
+    <div id="secretScreen" class="fixed inset-0 z-40 bg-gray-950 flex items-center justify-center p-4">
+        <div class="w-full max-w-md bg-waPanel p-8 rounded-3xl shadow-2xl border border-gray-800/80 text-center relative overflow-hidden">
+            <div class="absolute -top-12 -right-12 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl"></div>
+            
+            <div class="w-20 h-20 bg-emerald-950/80 border border-emerald-500/40 rounded-3xl flex items-center justify-center mx-auto mb-6 text-emerald-400 text-3xl shadow-inner">
+                <i class="fa-solid fa-lock"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-white mb-2">Security Verification</h2>
+            <p class="text-xs text-gray-400 mb-6 leading-relaxed">Enter the secret passcode provided by <b>MA productions</b> to gain access to the private network.</p>
+
+            <div class="relative mb-4">
+                <input type="password" id="secretCodeInput" placeholder="Enter Secret Code" 
+                    class="w-full bg-waDark border border-gray-700 focus:border-waGreen text-white text-center text-lg font-mono tracking-widest py-3.5 px-4 rounded-xl outline-none transition shadow-inner">
+                <button id="toggleShowCode" type="button" class="absolute right-3.5 top-4 text-gray-400 hover:text-white transition">
+                    <i class="fa-regular fa-eye"></i>
+                </button>
+            </div>
+
+            <div id="codeError" class="hidden text-red-400 text-xs font-semibold mb-4 bg-red-950/50 py-2.5 px-3 rounded-xl border border-red-800/40 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <span>Ghalat Passcode! Access Denied.</span>
+            </div>
+
+            <button id="verifyCodeBtn" class="w-full bg-waGreen hover:bg-emerald-600 text-waDark font-bold py-3.5 rounded-xl transition shadow-lg flex items-center justify-center gap-2 active:scale-98">
+                <span>Verify Access</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- 3. JOIN THE MESSENGER (REGISTER) SCREEN -->
+    <div id="joinScreen" class="hidden fixed inset-0 z-30 bg-gray-950 flex items-center justify-center p-4 overflow-y-auto">
+        <div class="w-full max-w-md bg-waPanel p-6 sm:p-8 rounded-3xl shadow-2xl border border-gray-800 my-auto">
+            <div class="text-center mb-6">
+                <div class="inline-flex items-center justify-center w-12 h-12 bg-emerald-950 border border-emerald-500/30 rounded-2xl text-emerald-400 text-xl mb-3">
+                    <i class="fa-solid fa-user-plus"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-white">Join the Messenger</h2>
+                <p class="text-xs text-gray-400 mt-1">Create your profile to join the MA Group Network</p>
+            </div>
+
+            <form id="registerForm" class="space-y-4">
+                <!-- Profile Image Mode Switcher -->
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-2">Select Profile Picture Mode</label>
+                    <div class="grid grid-cols-2 gap-2 mb-3">
+                        <button type="button" id="modeGhibliBtn" class="py-2.5 px-3 rounded-xl border text-xs font-bold transition flex items-center justify-center gap-2 border-waGreen bg-emerald-950/60 text-emerald-300">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            <span>Ghibli / Cartoon</span>
+                        </button>
+                        <button type="button" id="modeUploadBtn" class="py-2.5 px-3 rounded-xl border text-xs font-bold transition flex items-center justify-center gap-2 border-gray-700 bg-waDark text-gray-400 hover:text-white">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                            <span>Upload Own Photo</span>
+                        </button>
+                    </div>
+
+                    <!-- Ghibli Grid Option -->
+                    <div id="ghibliAvatarSection" class="p-3 bg-waDark rounded-2xl border border-gray-800">
+                        <p class="text-[11px] text-gray-400 mb-2 font-medium">Choose a Ghibli Cartoon Avatar:</p>
+                        <div id="ghibliGrid" class="grid grid-cols-4 gap-2">
+                            <!-- Populated dynamically by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Upload Custom Photo Option -->
+                    <div id="uploadAvatarSection" class="hidden p-4 bg-waDark rounded-2xl border border-gray-800 text-center">
+                        <div class="w-20 h-20 rounded-full mx-auto mb-3 border-2 border-dashed border-emerald-500/50 flex items-center justify-center bg-gray-900 relative overflow-hidden group">
+                            <img id="uploadPreviewImg" src="" class="hidden w-full h-full object-cover">
+                            <i id="uploadPreviewIcon" class="fa-solid fa-camera text-2xl text-emerald-400"></i>
+                        </div>
+                        <label class="inline-flex items-center gap-2 bg-emerald-950 text-emerald-400 hover:bg-emerald-900 border border-emerald-500/30 text-xs font-bold py-2 px-4 rounded-xl cursor-pointer transition">
+                            <i class="fa-solid fa-file-image"></i>
+                            <span>Choose Photo from Device</span>
+                            <input type="file" id="customAvatarInput" accept="image/*" class="hidden">
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1">Your Full Name <span class="text-red-400">*</span></label>
+                    <input type="text" id="regName" required placeholder="e.g. Moaz Ahmad" 
+                        class="w-full bg-waDark border border-gray-700 focus:border-waGreen text-white text-sm py-3 px-4 rounded-xl outline-none transition">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1">Mobile No. / Email <span class="text-red-400">*</span></label>
+                    <input type="text" id="regContact" required placeholder="e.g. +92 300 1234567 or email@domain.com" 
+                        class="w-full bg-waDark border border-gray-700 focus:border-waGreen text-white text-sm py-3 px-4 rounded-xl outline-none transition">
+                </div>
+
+                <div id="joinError" class="hidden text-red-400 text-xs font-semibold bg-red-950/50 py-2 px-3 rounded-xl border border-red-800/40 text-center">
+                    Please fill out all required fields.
+                </div>
+
+                <button type="submit" class="w-full bg-waGreen hover:bg-emerald-600 text-waDark font-bold py-3.5 rounded-xl transition shadow-lg flex items-center justify-center gap-2 mt-2">
+                    <i class="fa-solid fa-right-to-bracket"></i>
+                    <span>Join Group Chat Now</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 4. MAIN CHAT APPLICATION INTERFACE -->
+    <div id="mainApp" class="hidden flex-1 flex flex-col h-full max-w-5xl mx-auto w-full shadow-2xl border-x border-gray-800/80 relative overflow-hidden">
+        
+        <!-- MAIN HEADER -->
+        <header class="bg-waHeader border-b border-gray-800 px-4 py-3 flex items-center justify-between z-10">
+            <div class="flex items-center gap-3">
+                <button id="toggleMembersModalBtn" class="relative group text-left flex items-center gap-3 focus:outline-none">
+                    <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-emerald-700 to-teal-900 flex items-center justify-center text-white font-bold text-lg shadow border border-emerald-500/30">
+                        <i class="fa-solid fa-users text-sm"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-white font-bold text-base flex items-center gap-2 group-hover:text-emerald-400 transition">
+                            <span>MA Productions Group</span>
+                            <i class="fa-solid fa-circle-check text-waGreen text-xs" title="Verified Private Group"></i>
+                        </h2>
+                        <p id="memberCounterSubtext" class="text-xs text-emerald-400 font-medium">0 Members</p>
+                    </div>
+                </button>
+            </div>
+
+            <!-- Header Actions -->
+            <div class="flex items-center gap-1.5 sm:gap-3 text-gray-300">
+                <button id="startAudioCallBtn" class="p-2.5 hover:bg-gray-700/50 rounded-full transition text-emerald-400" title="Start Voice Call">
+                    <i class="fa-solid fa-phone text-lg"></i>
+                </button>
+                <button id="startVideoCallBtn" class="p-2.5 hover:bg-gray-700/50 rounded-full transition text-emerald-400" title="Start Video Call">
+                    <i class="fa-solid fa-video text-lg"></i>
+                </button>
+                <button id="openCameraBtn" class="p-2.5 hover:bg-gray-700/50 rounded-full transition text-gray-300 hover:text-white" title="Open Live Snap Camera">
+                    <i class="fa-solid fa-camera text-lg"></i>
+                </button>
+                <div class="h-6 w-[1px] bg-gray-700/80 mx-1"></div>
+                <!-- Profile Button -->
+                <button id="activeProfileBtn" class="p-1.5 hover:bg-gray-700/50 rounded-xl bg-gray-800/80 border border-gray-700 flex items-center gap-2 text-xs" title="Current Member Profile">
+                    <img id="currentUserAvatar" src="" class="w-6 h-6 rounded-full object-cover">
+                    <span id="currentUserName" class="hidden sm:inline font-bold text-white">Member</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- STORIES / STATUS BAR -->
+        <section class="bg-waPanel/90 border-b border-gray-800/80 px-4 py-3">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <i class="fa-solid fa-circle-notch text-emerald-400 animate-spin-slow"></i> Status / Stories
+                </span>
+                <span class="text-[10px] text-gray-500 font-mono">24 Hours Updates</span>
+            </div>
+            
+            <div id="storiesContainer" class="flex items-center gap-3 overflow-x-auto pb-1 scrollbar-none">
+                <!-- Add My Status Circle -->
+                <div id="addStatusBtn" class="flex flex-col items-center gap-1 cursor-pointer group flex-shrink-0">
+                    <div class="relative w-14 h-14 rounded-full p-[2px] bg-gray-800 group-hover:border-emerald-400 border border-dashed border-gray-600 transition flex items-center justify-center">
+                        <img id="myStatusAvatar" src="" class="w-full h-full rounded-full object-cover opacity-70">
+                        <div class="absolute bottom-0 right-0 bg-waGreen text-waDark text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold border-2 border-waDark shadow">
+                            <i class="fa-solid fa-plus"></i>
+                        </div>
+                    </div>
+                    <span class="text-[11px] font-semibold text-gray-300 group-hover:text-emerald-400 transition">My Status</span>
+                </div>
+
+                <div class="h-10 w-[1px] bg-gray-800 flex-shrink-0"></div>
+
+                <!-- Active Stories List populated here -->
+                <div id="activeStoriesList" class="flex items-center gap-3"></div>
+            </div>
+        </section>
+
+        <!-- CHAT MESSAGES AREA -->
+        <main id="chatMessages" class="flex-1 chat-bg p-4 overflow-y-auto space-y-3 flex flex-col">
+            <!-- Messages rendered here -->
+        </main>
+
+        <!-- INPUT TOOLBAR -->
+        <footer class="bg-waHeader p-3 border-t border-gray-800">
+            <div id="recordingStatus" class="hidden bg-red-950/80 border border-red-800/60 p-2.5 rounded-2xl mb-2 flex items-center justify-between text-red-400 text-sm animate-pulse">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-microphone-lines text-lg"></i>
+                    <span>Recording Audio... <b id="recordingTimer" class="font-mono font-bold">0:00</b></span>
+                </div>
+                <button id="cancelRecordBtn" class="text-xs bg-red-900/80 hover:bg-red-800 text-white px-3 py-1 rounded-lg">Cancel</button>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <div class="relative">
+                    <button id="attachMenuBtn" class="p-3 text-gray-400 hover:text-white hover:bg-gray-700/50 rounded-full transition">
+                        <i class="fa-solid fa-paperclip text-xl"></i>
+                    </button>
+                    <div id="attachPopup" class="hidden absolute bottom-14 left-0 bg-waPanel border border-gray-700 rounded-2xl p-3 shadow-2xl flex gap-3 z-20">
+                        <label class="flex flex-col items-center gap-1 text-xs text-gray-300 hover:text-white cursor-pointer p-2.5 hover:bg-gray-700/50 rounded-xl transition">
+                            <div class="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center text-white text-lg">
+                                <i class="fa-solid fa-image"></i>
+                            </div>
+                            <span>Photo</span>
+                            <input type="file" id="imageInput" accept="image/*" class="hidden">
+                        </label>
+                        <label class="flex flex-col items-center gap-1 text-xs text-gray-300 hover:text-white cursor-pointer p-2.5 hover:bg-gray-700/50 rounded-xl transition">
+                            <div class="w-10 h-10 rounded-full bg-pink-600 flex items-center justify-center text-white text-lg">
+                                <i class="fa-solid fa-video"></i>
+                            </div>
+                            <span>Video</span>
+                            <input type="file" id="videoInput" accept="video/*" class="hidden">
+                        </label>
+                    </div>
+                </div>
+
+                <input type="text" id="messageInput" placeholder="Type a message..." 
+                    class="flex-1 bg-waDark text-white placeholder-gray-500 py-3 px-4 rounded-2xl border border-gray-700 focus:border-waGreen outline-none text-sm transition">
+
+                <button id="micBtn" class="p-3 bg-gray-800 hover:bg-gray-700 text-waGreen rounded-full transition shadow" title="Record Voice Note">
+                    <i class="fa-solid fa-microphone text-lg"></i>
+                </button>
+                <button id="sendBtn" class="p-3 bg-waGreen hover:bg-emerald-600 text-waDark rounded-full transition font-bold shadow flex items-center justify-center" title="Send Message">
+                    <i class="fa-solid fa-paper-plane text-lg"></i>
+                </button>
+            </div>
+        </footer>
+    </div>
+
+    <!-- 5. CREATE STATUS / STORY MODAL -->
+    <div id="createStatusModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="w-full max-w-md bg-waPanel p-6 rounded-3xl shadow-2xl border border-gray-800">
+            <div class="flex items-center justify-between pb-3 border-b border-gray-800 mb-4">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-circle-notch text-waGreen"></i> Add Status Update
+                </h3>
+                <button id="closeCreateStatusBtn" class="text-gray-400 hover:text-white p-2">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Status Type Selector -->
+            <div class="flex gap-2 mb-4">
+                <button type="button" id="statusTypeTextBtn" class="flex-1 py-2 rounded-xl border text-xs font-bold border-waGreen bg-emerald-950/60 text-emerald-300">
+                    <i class="fa-solid fa-font mr-1"></i> Text Status
+                </button>
+                <button type="button" id="statusTypeMediaBtn" class="flex-1 py-2 rounded-xl border text-xs font-bold border-gray-700 bg-waDark text-gray-400 hover:text-white">
+                    <i class="fa-solid fa-photo-film mr-1"></i> Photo / Video
+                </button>
+            </div>
+
+            <!-- Text Status Option -->
+            <div id="textStatusBlock" class="space-y-3">
+                <textarea id="statusCaptionText" rows="4" placeholder="What's on your mind?..." 
+                    class="w-full bg-waDark border border-gray-700 focus:border-waGreen text-white text-sm p-3 rounded-xl outline-none resize-none"></textarea>
+                
+                <div>
+                    <label class="block text-[11px] text-gray-400 mb-1 font-semibold">Background Color</label>
+                    <div id="colorBgPicker" class="flex gap-2">
+                        <button class="w-8 h-8 rounded-full bg-teal-800 border-2 border-white focus:outline-none" data-color="from-teal-900 to-emerald-800"></button>
+                        <button class="w-8 h-8 rounded-full bg-purple-800 border-2 border-transparent focus:outline-none" data-color="from-purple-900 to-indigo-900"></button>
+                        <button class="w-8 h-8 rounded-full bg-rose-800 border-2 border-transparent focus:outline-none" data-color="from-rose-900 to-pink-900"></button>
+                        <button class="w-8 h-8 rounded-full bg-amber-800 border-2 border-transparent focus:outline-none" data-color="from-amber-900 to-orange-900"></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Media Status Option -->
+            <div id="mediaStatusBlock" class="hidden space-y-3">
+                <div class="border-2 border-dashed border-gray-700 rounded-2xl p-6 text-center bg-waDark">
+                    <i class="fa-solid fa-cloud-arrow-up text-3xl text-emerald-400 mb-2"></i>
+                    <p class="text-xs text-gray-300 mb-3">Select photo or video for story</p>
+                    <label class="bg-emerald-950 text-emerald-400 border border-emerald-500/30 text-xs font-bold py-2 px-4 rounded-xl cursor-pointer hover:bg-emerald-900 transition">
+                        Browse Files
+                        <input type="file" id="statusFileInput" accept="image/*,video/*" class="hidden">
+                    </label>
+                    <div id="statusMediaPreview" class="hidden mt-3 max-h-40 rounded-xl overflow-hidden border border-gray-700"></div>
+                </div>
+            </div>
+
+            <button id="postStatusBtn" class="w-full bg-waGreen hover:bg-emerald-600 text-waDark font-bold py-3 rounded-xl transition shadow-lg mt-5 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-paper-plane"></i>
+                <span>Post Status</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- 6. FULLSCREEN STORY VIEWER MODAL -->
+    <div id="storyViewerModal" class="hidden fixed inset-0 z-50 bg-black/95 flex flex-col justify-between p-4">
+        <!-- Story Header -->
+        <div class="w-full max-w-md mx-auto pt-2">
+            <!-- Progress Bar Container -->
+            <div id="storyProgressBarContainer" class="w-full h-1 bg-gray-700 rounded-full mb-3 overflow-hidden">
+                <div id="storyProgressBar" class="h-full bg-emerald-400 w-0"></div>
+            </div>
+
+            <div class="flex items-center justify-between text-white">
+                <div class="flex items-center gap-3">
+                    <img id="storyUserAvatar" src="" class="w-10 h-10 rounded-full object-cover border border-emerald-400">
+                    <div>
+                        <h4 id="storyUserName" class="text-sm font-bold text-white">Member Name</h4>
+                        <p id="storyTimestamp" class="text-[10px] text-gray-400 font-mono">Today, 12:00 PM</p>
+                    </div>
+                </div>
+                <button id="closeStoryViewerBtn" class="text-gray-400 hover:text-white p-2 text-xl">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Story Display Content -->
+        <div id="storyViewerBody" class="w-full max-w-md mx-auto flex-1 my-4 flex items-center justify-center rounded-3xl overflow-hidden relative">
+            <!-- Dynamic Image, Video or Text Status rendered here -->
+        </div>
+    </div>
+
+    <!-- 7. MEMBERS LIST MODAL -->
+    <div id="membersModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="w-full max-w-md bg-waPanel p-6 rounded-3xl shadow-2xl border border-gray-800">
+            <div class="flex items-center justify-between pb-4 border-b border-gray-800 mb-4">
+                <div>
+                    <h3 class="text-lg font-bold text-white">Registered Members</h3>
+                    <p class="text-xs text-gray-400">People who unlocked & joined via secret code</p>
+                </div>
+                <button id="closeMembersModalBtn" class="text-gray-400 hover:text-white p-2">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <div id="membersListContainer" class="space-y-2.5 max-h-72 overflow-y-auto pr-1"></div>
+
+            <div class="mt-6 pt-4 border-t border-gray-800/80 flex justify-between items-center">
+                <button id="resetAppBtn" class="text-xs text-red-400 hover:text-red-300 hover:underline flex items-center gap-1.5">
+                    <i class="fa-solid fa-trash-can"></i>
+                    <span>Reset All App Data</span>
+                </button>
+                <button id="addNewMemberBtn" class="text-xs bg-emerald-950 text-emerald-400 border border-emerald-500/30 px-3 py-1.5 rounded-lg hover:bg-emerald-900 transition font-semibold">
+                    + Add New Member
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 8. LIVE SNAP CAMERA MODAL -->
+    <div id="cameraModal" class="hidden fixed inset-0 z-50 bg-black/95 backdrop-blur flex flex-col items-center justify-between p-4">
+        <div class="w-full flex justify-between items-center max-w-xl text-white pt-2 px-2">
+            <span class="font-semibold text-sm flex items-center gap-2">
+                <i class="fa-solid fa-circle text-red-500 text-xs animate-ping"></i> MA Live Camera Snap
+            </span>
+            <button id="closeCameraBtn" class="p-2 text-gray-400 hover:text-white text-2xl">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="relative w-full max-w-xl flex-1 flex items-center justify-center my-4 overflow-hidden rounded-3xl bg-black border border-gray-800">
+            <video id="cameraVideo" autoplay playsinline class="w-full h-full object-cover"></video>
+            <canvas id="cameraCanvas" class="hidden"></canvas>
+        </div>
+
+        <div class="w-full max-w-xl flex items-center justify-center gap-6 py-4">
+            <button id="capturePhotoBtn" class="w-16 h-16 rounded-full border-4 border-white bg-red-600 hover:bg-red-500 flex items-center justify-center shadow-2xl transition active:scale-90">
+                <i class="fa-solid fa-camera text-white text-2xl"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- 9. VOICE / VIDEO CALL MODAL -->
+    <div id="callModal" class="hidden fixed inset-0 z-50 bg-gray-950 flex flex-col items-center justify-between p-6">
+        <div class="text-center mt-8">
+            <div class="w-24 h-24 rounded-full bg-emerald-900 border-4 border-emerald-500/30 flex items-center justify-center text-white text-3xl mx-auto mb-4 shadow-2xl overflow-hidden relative">
+                <i id="callUserIcon" class="fa-solid fa-users"></i>
+            </div>
+            <h3 id="callTitle" class="text-2xl font-bold text-white mb-1">MA Group Call</h3>
+            <p id="callStatusText" class="text-sm text-emerald-400 animate-pulse">Connecting to group members...</p>
+        </div>
+
+        <div id="callVideoContainer" class="hidden relative w-full max-w-md h-72 bg-black rounded-3xl overflow-hidden border border-gray-800 my-auto shadow-2xl">
+            <video id="remoteCallVideo" autoplay playsinline class="w-full h-full object-cover"></video>
+            <div class="absolute bottom-3 right-3 w-28 h-36 bg-gray-900 rounded-2xl overflow-hidden border border-gray-700 shadow-xl">
+                <video id="selfCallVideo" autoplay playsinline muted class="w-full h-full object-cover"></video>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-6 mb-8">
+            <button id="toggleMuteCallBtn" class="w-14 h-14 rounded-full bg-gray-800 text-white hover:bg-gray-700 flex items-center justify-center text-xl transition">
+                <i class="fa-solid fa-microphone"></i>
+            </button>
+            <button id="endCallBtn" class="w-16 h-16 rounded-full bg-red-600 hover:bg-red-700 text-white flex items-center justify-center text-2xl transition shadow-xl active:scale-95">
+                <i class="fa-solid fa-phone-slash"></i>
+            </button>
+            <button id="toggleCamCallBtn" class="w-14 h-14 rounded-full bg-gray-800 text-white hover:bg-gray-700 flex items-center justify-center text-xl transition">
+                <i class="fa-solid fa-video"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // --- CONSTANTS ---
+        const SECRET_CODE = "Moaz@511";
+
+        // Ghibli / Cartoon Animated Avatars List
+        const GHIBLI_AVATARS = [
+            "https://api.dicebear.com/7.x/bottts/svg?seed=GhibliTotoro&backgroundColor=0d9488",
+            "https://api.dicebear.com/7.x/adventurer/svg?seed=Chihiro&backgroundColor=14b8a6",
+            "https://api.dicebear.com/7.x/adventurer/svg?seed=Howl&backgroundColor=0284c7",
+            "https://api.dicebear.com/7.x/bottts/svg?seed=Calcifer&backgroundColor=e11d48",
+            "https://api.dicebear.com/7.x/adventurer/svg?seed=Kiki&backgroundColor=7c3aed",
+            "https://api.dicebear.com/7.x/bottts/svg?seed=NoFace&backgroundColor=0f172a",
+            "https://api.dicebear.com/7.x/adventurer/svg?seed=Ponyo&backgroundColor=ea580c",
+            "https://api.dicebear.com/7.x/bottts/svg?seed=Mononoke&backgroundColor=15803d"
+        ];
+
+        // --- STATE VARIABLES ---
+        let registeredMembers = []; // Starts at 0 initially!
+        let messages = [];
+        let statuses = []; // Story / Status items
+        let currentUser = null;
+
+        let regAvatarType = 'ghibli'; // 'ghibli' or 'upload'
+        let selectedGhibliAvatar = GHIBLI_AVATARS[0];
+        let uploadedCustomAvatar = '';
+
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let isRecording = false;
+        let recordStartTime = 0;
+        let recordTimerInterval = null;
+        let cameraStream = null;
+        let callStream = null;
+
+        let selectedStatusType = 'text'; // 'text' or 'media'
+        let statusBgColor = 'from-teal-900 to-emerald-800';
+        let statusMediaData = '';
+        let storyTimer = null;
+
+        // --- DOM REFERENCES ---
+        const splashScreen = document.getElementById('splashScreen');
+        const secretScreen = document.getElementById('secretScreen');
+        const joinScreen = document.getElementById('joinScreen');
+        const mainApp = document.getElementById('mainApp');
+
+        const secretCodeInput = document.getElementById('secretCodeInput');
+        const verifyCodeBtn = document.getElementById('verifyCodeBtn');
+        const codeError = document.getElementById('codeError');
+        const toggleShowCode = document.getElementById('toggleShowCode');
+
+        const registerForm = document.getElementById('registerForm');
+        const regName = document.getElementById('regName');
+        const regContact = document.getElementById('regContact');
+        const modeGhibliBtn = document.getElementById('modeGhibliBtn');
+        const modeUploadBtn = document.getElementById('modeUploadBtn');
+        const ghibliAvatarSection = document.getElementById('ghibliAvatarSection');
+        const uploadAvatarSection = document.getElementById('uploadAvatarSection');
+        const ghibliGrid = document.getElementById('ghibliGrid');
+        const customAvatarInput = document.getElementById('customAvatarInput');
+        const uploadPreviewImg = document.getElementById('uploadPreviewImg');
+        const uploadPreviewIcon = document.getElementById('uploadPreviewIcon');
+        const joinError = document.getElementById('joinError');
+
+        const memberCounterSubtext = document.getElementById('memberCounterSubtext');
+        const currentUserName = document.getElementById('currentUserName');
+        const currentUserAvatar = document.getElementById('currentUserAvatar');
+        const myStatusAvatar = document.getElementById('myStatusAvatar');
+
+        const chatMessages = document.getElementById('chatMessages');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const micBtn = document.getElementById('micBtn');
+
+        const attachMenuBtn = document.getElementById('attachMenuBtn');
+        const attachPopup = document.getElementById('attachPopup');
+        const imageInput = document.getElementById('imageInput');
+        const videoInput = document.getElementById('videoInput');
+
+        const activeStoriesList = document.getElementById('activeStoriesList');
+        const addStatusBtn = document.getElementById('addStatusBtn');
+        const createStatusModal = document.getElementById('createStatusModal');
+        const closeCreateStatusBtn = document.getElementById('closeCreateStatusBtn');
+        const statusTypeTextBtn = document.getElementById('statusTypeTextBtn');
+        const statusTypeMediaBtn = document.getElementById('statusTypeMediaBtn');
+        const textStatusBlock = document.getElementById('textStatusBlock');
+        const mediaStatusBlock = document.getElementById('mediaStatusBlock');
+        const statusCaptionText = document.getElementById('statusCaptionText');
+        const statusFileInput = document.getElementById('statusFileInput');
+        const statusMediaPreview = document.getElementById('statusMediaPreview');
+        const postStatusBtn = document.getElementById('postStatusBtn');
+
+        const storyViewerModal = document.getElementById('storyViewerModal');
+        const closeStoryViewerBtn = document.getElementById('closeStoryViewerBtn');
+        const storyUserAvatar = document.getElementById('storyUserAvatar');
+        const storyUserName = document.getElementById('storyUserName');
+        const storyTimestamp = document.getElementById('storyTimestamp');
+        const storyViewerBody = document.getElementById('storyViewerBody');
+        const storyProgressBar = document.getElementById('storyProgressBar');
+
+        const toggleMembersModalBtn = document.getElementById('toggleMembersModalBtn');
+        const activeProfileBtn = document.getElementById('activeProfileBtn');
+        const membersModal = document.getElementById('membersModal');
+        const closeMembersModalBtn = document.getElementById('closeMembersModalBtn');
+        const membersListContainer = document.getElementById('membersListContainer');
+        const resetAppBtn = document.getElementById('resetAppBtn');
+        const addNewMemberBtn = document.getElementById('addNewMemberBtn');
+
+        const openCameraBtn = document.getElementById('openCameraBtn');
+        const cameraModal = document.getElementById('cameraModal');
+        const closeCameraBtn = document.getElementById('closeCameraBtn');
+        const cameraVideo = document.getElementById('cameraVideo');
+        const capturePhotoBtn = document.getElementById('capturePhotoBtn');
+        const cameraCanvas = document.getElementById('cameraCanvas');
+
+        const startAudioCallBtn = document.getElementById('startAudioCallBtn');
+        const startVideoCallBtn = document.getElementById('startVideoCallBtn');
+        const callModal = document.getElementById('callModal');
+        const endCallBtn = document.getElementById('endCallBtn');
+        const callTitle = document.getElementById('callTitle');
+        const callStatusText = document.getElementById('callStatusText');
+        const callVideoContainer = document.getElementById('callVideoContainer');
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadStoredData();
+            renderGhibliGrid();
+
+            setTimeout(() => {
+                splashScreen.classList.add('opacity-0');
+                setTimeout(() => splashScreen.classList.add('hidden'), 700);
+            }, 2000);
+        });
+
+        function loadStoredData() {
+            const savedMembers = localStorage.getItem('ma_members');
+            if (savedMembers) {
+                try { registeredMembers = JSON.parse(savedMembers); } catch(e) { registeredMembers = []; }
+            } else {
+                registeredMembers = []; // STRICTLY 0 MEMBERS INITIALLY
+            }
+
+            const savedMsgs = localStorage.getItem('ma_messages');
+            if (savedMsgs) {
+                try { messages = JSON.parse(savedMsgs); } catch(e) { messages = []; }
+            } else {
+                messages = [];
+            }
+
+            const savedStatus = localStorage.getItem('ma_statuses');
+            if (savedStatus) {
+                try { statuses = JSON.parse(savedStatus); } catch(e) { statuses = []; }
+            } else {
+                statuses = [];
+            }
+
+            const savedUser = localStorage.getItem('ma_current_user');
+            if (savedUser) {
+                try { currentUser = JSON.parse(savedUser); } catch(e) { currentUser = null; }
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem('ma_members', JSON.stringify(registeredMembers));
+            localStorage.setItem('ma_messages', JSON.stringify(messages));
+            localStorage.setItem('ma_statuses', JSON.stringify(statuses));
+            if (currentUser) {
+                localStorage.setItem('ma_current_user', JSON.stringify(currentUser));
+            } else {
+                localStorage.removeItem('ma_current_user');
+            }
+        }
+
+        // --- SECRET CODE VERIFICATION ---
+        toggleShowCode.addEventListener('click', () => {
+            const isPassword = secretCodeInput.type === 'password';
+            secretCodeInput.type = isPassword ? 'text' : 'password';
+            toggleShowCode.innerHTML = isPassword ? '<i class="fa-regular fa-eye-slash"></i>' : '<i class="fa-regular fa-eye"></i>';
+        });
+
+        verifyCodeBtn.addEventListener('click', verifySecretCode);
+        secretCodeInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') verifySecretCode();
+        });
+
+        function verifySecretCode() {
+            const entered = secretCodeInput.value.trim();
+            if (entered === SECRET_CODE) {
+                codeError.classList.add('hidden');
+                secretScreen.classList.add('hidden');
+
+                if (currentUser && registeredMembers.some(m => m.id === currentUser.id)) {
+                    openMainApp();
+                } else {
+                    joinScreen.classList.remove('hidden');
+                }
+            } else {
+                codeError.classList.remove('hidden');
+            }
+        }
+
+        // --- PROFILE PICTURE SELECTION (GHIBLI vs UPLOAD) ---
+        modeGhibliBtn.addEventListener('click', () => {
+            regAvatarType = 'ghibli';
+            modeGhibliBtn.className = "py-2.5 px-3 rounded-xl border text-xs font-bold transition flex items-center justify-center gap-2 border-waGreen bg-emerald-950/60 text-emerald-300";
+            modeUploadBtn.className = "py-2.5 px-3 rounded-xl border text-xs font-bold transition flex items-center justify-center gap-2 border-gray-700 bg-waDark text-gray-400 hover:text-white";
+            ghibliAvatarSection.classList.remove('hidden');
+            uploadAvatarSection.classList.add('hidden');
+        });
+
+        modeUploadBtn.addEventListener('click', () => {
+            regAvatarType = 'upload';
+            modeUploadBtn.className = "py-2.5 px-3 rounded-xl border text-xs font-bold transition flex items-center justify-center gap-2 border-waGreen bg-emerald-950/60 text-emerald-300";
+            modeGhibliBtn.className = "py-2.5 px-3 rounded-xl border text-xs font-bold transition flex items-center justify-center gap-2 border-gray-700 bg-waDark text-gray-400 hover:text-white";
+            uploadAvatarSection.classList.remove('hidden');
+            ghibliAvatarSection.classList.add('hidden');
+        });
+
+        function renderGhibliGrid() {
+            ghibliGrid.innerHTML = '';
+            GHIBLI_AVATARS.forEach((url) => {
+                const img = document.createElement('img');
+                img.src = url;
+                img.className = `w-14 h-14 rounded-2xl p-1 bg-gray-900 border-2 cursor-pointer transition transform hover:scale-105 ${
+                    url === selectedGhibliAvatar ? 'border-waGreen shadow-lg bg-emerald-950' : 'border-gray-800 opacity-60 hover:opacity-100'
+                }`;
+                img.addEventListener('click', () => {
+                    selectedGhibliAvatar = url;
+                    renderGhibliGrid();
+                });
+                ghibliGrid.appendChild(img);
+            });
+        }
+
+        customAvatarInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    uploadedCustomAvatar = evt.target.result;
+                    uploadPreviewImg.src = uploadedCustomAvatar;
+                    uploadPreviewImg.classList.remove('hidden');
+                    uploadPreviewIcon.classList.add('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // --- REGISTRATION / JOIN MESSENGER LOGIC ---
+        registerForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const nameVal = regName.value.trim();
+            const contactVal = regContact.value.trim();
+
+            if (!nameVal || !contactVal) {
+                joinError.classList.remove('hidden');
+                return;
+            }
+
+            let finalAvatar = selectedGhibliAvatar;
+            if (regAvatarType === 'upload') {
+                if (!uploadedCustomAvatar) {
+                    alert("Please select an image file to upload or switch to Ghibli cartoon avatar mode.");
+                    return;
+                }
+                finalAvatar = uploadedCustomAvatar;
+            }
+
+            joinError.classList.add('hidden');
+
+            const newMember = {
+                id: 'usr_' + Date.now(),
+                name: nameVal,
+                contact: contactVal,
+                avatar: finalAvatar,
+                joinedAt: new Date().toLocaleDateString()
+            };
+
+            registeredMembers.push(newMember);
+            currentUser = newMember;
+            saveData();
+
+            joinScreen.classList.add('hidden');
+            openMainApp();
+        });
+
+        function openMainApp() {
+            mainApp.classList.remove('hidden');
+            updateAppHeaderUI();
+            renderStoriesBar();
+            renderMessages();
+        }
+
+        function updateAppHeaderUI() {
+            if (currentUser) {
+                currentUserName.textContent = currentUser.name;
+                currentUserAvatar.src = currentUser.avatar;
+                myStatusAvatar.src = currentUser.avatar;
+            }
+
+            const count = registeredMembers.length;
+            memberCounterSubtext.textContent = `${count} ${count === 1 ? 'Member' : 'Members'}`;
+        }
+
+        // --- STORIES / STATUS FEATURE ---
+        addStatusBtn.addEventListener('click', () => {
+            createStatusModal.classList.remove('hidden');
+        });
+
+        closeCreateStatusBtn.addEventListener('click', () => {
+            createStatusModal.classList.add('hidden');
+        });
+
+        statusTypeTextBtn.addEventListener('click', () => {
+            selectedStatusType = 'text';
+            statusTypeTextBtn.className = "flex-1 py-2 rounded-xl border text-xs font-bold border-waGreen bg-emerald-950/60 text-emerald-300";
+            statusTypeMediaBtn.className = "flex-1 py-2 rounded-xl border text-xs font-bold border-gray-700 bg-waDark text-gray-400 hover:text-white";
+            textStatusBlock.classList.remove('hidden');
+            mediaStatusBlock.classList.add('hidden');
+        });
+
+        statusTypeMediaBtn.addEventListener('click', () => {
+            selectedStatusType = 'media';
+            statusTypeMediaBtn.className = "flex-1 py-2 rounded-xl border text-xs font-bold border-waGreen bg-emerald-950/60 text-emerald-300";
+            statusTypeTextBtn.className = "flex-1 py-2 rounded-xl border text-xs font-bold border-gray-700 bg-waDark text-gray-400 hover:text-white";
+            mediaStatusBlock.classList.remove('hidden');
+            textStatusBlock.classList.add('hidden');
+        });
+
+        // Color Picker for Text Status
+        document.querySelectorAll('#colorBgPicker button').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('#colorBgPicker button').forEach(b => b.classList.replace('border-white', 'border-transparent'));
+                btn.classList.replace('border-transparent', 'border-white');
+                statusBgColor = btn.getAttribute('data-color');
+            });
+        });
+
+        statusFileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    statusMediaData = {
+                        data: evt.target.result,
+                        isVideo: file.type.startsWith('video')
+                    };
+                    statusMediaPreview.classList.remove('hidden');
+                    if (statusMediaData.isVideo) {
+                        statusMediaPreview.innerHTML = `<video src="${statusMediaData.data}" class="w-full h-32 object-cover"></video>`;
+                    } else {
+                        statusMediaPreview.innerHTML = `<img src="${statusMediaData.data}" class="w-full h-32 object-cover">`;
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        postStatusBtn.addEventListener('click', () => {
+            if (!currentUser) return;
+
+            let newStatus = {
+                id: 'st_' + Date.now(),
+                userId: currentUser.id,
+                userName: currentUser.name,
+                userAvatar: currentUser.avatar,
+                timestamp: getCurrentTime(),
+                type: selectedStatusType
+            };
+
+            if (selectedStatusType === 'text') {
+                const text = statusCaptionText.value.trim();
+                if (!text) return alert("Please type something for your status!");
+                newStatus.content = text;
+                newStatus.bgColor = statusBgColor;
+            } else {
+                if (!statusMediaData) return alert("Please select a photo or video for your status!");
+                newStatus.content = statusMediaData.data;
+                newStatus.isVideo = statusMediaData.isVideo;
+            }
+
+            statuses.unshift(newStatus);
+            saveData();
+            renderStoriesBar();
+
+            // Reset Form & Close
+            statusCaptionText.value = '';
+            statusMediaData = '';
+            statusMediaPreview.classList.add('hidden');
+            createStatusModal.classList.add('hidden');
+        });
+
+        function renderStoriesBar() {
+            activeStoriesList.innerHTML = '';
+
+            if (statuses.length === 0) {
+                activeStoriesList.innerHTML = '<span class="text-xs text-gray-500 italic">No recent status updates</span>';
+                return;
+            }
+
+            statuses.forEach((st) => {
+                const item = document.createElement('div');
+                item.className = "flex flex-col items-center gap-1 cursor-pointer group flex-shrink-0";
+                item.innerHTML = `
+                    <div class="relative w-14 h-14 rounded-full p-[2px] bg-gradient-to-tr from-emerald-400 via-teal-300 to-green-500 shadow-md transform group-hover:scale-105 transition">
+                        <img src="${st.userAvatar}" class="w-full h-full rounded-full object-cover border-2 border-waDark">
+                    </div>
+                    <span class="text-[11px] font-medium text-gray-300 group-hover:text-emerald-400 transition truncate max-w-[60px]">${escapeHtml(st.userName)}</span>
+                `;
+                item.addEventListener('click', () => openStoryViewer(st));
+                activeStoriesList.appendChild(item);
+            });
+        }
+
+        function openStoryViewer(st) {
+            storyUserAvatar.src = st.userAvatar;
+            storyUserName.textContent = st.userName;
+            storyTimestamp.textContent = `Today, ${st.timestamp}`;
+            storyViewerBody.innerHTML = '';
+
+            if (st.type === 'text') {
+                storyViewerBody.innerHTML = `
+                    <div class="w-full h-full min-h-[350px] bg-gradient-to-br ${st.bgColor} flex items-center justify-center p-8 text-center text-white text-xl font-bold leading-relaxed shadow-inner rounded-3xl">
+                        "${escapeHtml(st.content)}"
+                    </div>
+                `;
+            } else if (st.isVideo) {
+                storyViewerBody.innerHTML = `<video src="${st.content}" autoplay playsinline class="max-w-full max-h-full rounded-3xl object-contain"></video>`;
+            } else {
+                storyViewerBody.innerHTML = `<img src="${st.content}" class="max-w-full max-h-full rounded-3xl object-contain">`;
+            }
+
+            storyViewerModal.classList.remove('hidden');
+
+            // Reset & Start Progress animation
+            storyProgressBar.className = "h-full bg-emerald-400 w-0";
+            void storyProgressBar.offsetWidth; // trigger reflow
+            storyProgressBar.className = "h-full bg-emerald-400 story-progress-active";
+
+            clearTimeout(storyTimer);
+            storyTimer = setTimeout(() => {
+                closeStoryViewerModal();
+            }, 5000);
+        }
+
+        closeStoryViewerBtn.addEventListener('click', closeStoryViewerModal);
+
+        function closeStoryViewerModal() {
+            clearTimeout(storyTimer);
+            storyViewerModal.classList.add('hidden');
+        }
+
+        // --- CHAT MESSAGES LOGIC ---
+        function renderMessages() {
+            chatMessages.innerHTML = '';
+
+            if (messages.length === 0) {
+                chatMessages.innerHTML = `
+                    <div class="my-auto flex flex-col items-center justify-center text-center p-6 bg-waPanel/40 border border-gray-800/80 rounded-3xl max-w-sm mx-auto shadow-inner">
+                        <div class="w-16 h-16 rounded-full bg-emerald-950/80 text-emerald-400 flex items-center justify-center text-2xl mb-3 border border-emerald-500/20">
+                            <i class="fa-solid fa-comments"></i>
+                        </div>
+                        <h4 class="text-white font-bold text-base mb-1">No messages yet</h4>
+                        <p class="text-xs text-gray-400">Start the conversation with your group members!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            messages.forEach((msg) => {
+                const isMe = currentUser && msg.senderId === currentUser.id;
+                const msgWrapper = document.createElement('div');
+                msgWrapper.className = `flex flex-col ${isMe ? 'items-end' : 'items-start'} my-1`;
+
+                let contentHtml = '';
+
+                if (msg.type === 'text') {
+                    contentHtml = `<p class="text-sm text-gray-100 break-words leading-relaxed">${escapeHtml(msg.content)}</p>`;
+                } else if (msg.type === 'image') {
+                    contentHtml = `
+                        <div class="rounded-xl overflow-hidden my-1 max-w-xs border border-gray-700/50">
+                            <img src="${msg.content}" class="w-full h-auto object-cover max-h-64 rounded-lg">
+                        </div>`;
+                } else if (msg.type === 'video') {
+                    contentHtml = `
+                        <div class="rounded-xl overflow-hidden my-1 max-w-xs border border-gray-700/50">
+                            <video src="${msg.content}" controls class="w-full h-auto max-h-64 rounded-lg"></video>
+                        </div>`;
+                } else if (msg.type === 'audio') {
+                    contentHtml = `
+                        <div class="flex items-center gap-2 py-1 min-w-[200px]">
+                            <i class="fa-solid fa-microphone text-emerald-400 text-lg"></i>
+                            <audio src="${msg.content}" controls class="w-full h-8 rounded"></audio>
+                        </div>`;
+                }
+
+                msgWrapper.innerHTML = `
+                    <div class="max-w-[85%] sm:max-w-[70%] px-3.5 py-2 rounded-2xl shadow-md ${
+                        isMe ? 'bg-waOutgoing rounded-tr-none' : 'bg-waIncoming rounded-tl-none border border-gray-800'
+                    }">
+                        ${!isMe ? `<span class="text-xs font-bold text-emerald-400 block mb-1">${escapeHtml(msg.senderName)}</span>` : ''}
+                        ${contentHtml}
+                        <div class="flex items-center justify-end gap-1 mt-1 text-[10px] text-gray-400 font-mono">
+                            <span>${msg.timestamp}</span>
+                            ${isMe ? '<i class="fa-solid fa-check-double text-emerald-400"></i>' : ''}
+                        </div>
+                    </div>
+                `;
+
+                chatMessages.appendChild(msgWrapper);
+            });
+
+            scrollToBottom();
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/[&<>"']/g, function(m) {
+                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
+            });
+        }
+
+        function scrollToBottom() {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        sendBtn.addEventListener('click', sendTextMessage);
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendTextMessage();
+        });
+
+        function sendTextMessage() {
+            const text = messageInput.value.trim();
+            if (!text || !currentUser) return;
+
+            const newMsg = {
+                id: 'm_' + Date.now(),
+                senderId: currentUser.id,
+                senderName: currentUser.name,
+                type: 'text',
+                content: text,
+                timestamp: getCurrentTime()
+            };
+
+            messages.push(newMsg);
+            saveData();
+            renderMessages();
+            messageInput.value = '';
+        }
+
+        function getCurrentTime() {
+            return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        // --- ATTACHMENTS (IMAGE / VIDEO) ---
+        attachMenuBtn.addEventListener('click', () => attachPopup.classList.toggle('hidden'));
+
+        imageInput.addEventListener('change', (e) => handleFileUpload(e, 'image'));
+        videoInput.addEventListener('change', (e) => handleFileUpload(e, 'video'));
+
+        function handleFileUpload(e, type) {
+            const file = e.target.files[0];
+            if (!file || !currentUser) return;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const newMsg = {
+                    id: 'm_' + Date.now(),
+                    senderId: currentUser.id,
+                    senderName: currentUser.name,
+                    type: type,
+                    content: evt.target.result,
+                    timestamp: getCurrentTime()
+                };
+                messages.push(newMsg);
+                saveData();
+                renderMessages();
+                attachPopup.classList.add('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // --- MICROPHONE VOICE NOTES RECORDING ---
+        micBtn.addEventListener('click', () => {
+            if (!isRecording) startAudioRecording();
+            else stopAudioRecording();
+        });
+
+        document.getElementById('cancelRecordBtn').addEventListener('click', () => {
+            if (mediaRecorder && isRecording) {
+                mediaRecorder.stop();
+                isRecording = false;
+                clearInterval(recordTimerInterval);
+                document.getElementById('recordingStatus').classList.add('hidden');
+            }
+        });
+
+        async function startAudioRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+
+                mediaRecorder.ondataavailable = (event) => audioChunks.push(event.data);
+
+                mediaRecorder.onstop = () => {
+                    stream.getTracks().forEach(track => track.stop());
+                    if (audioChunks.length > 0 && currentUser) {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                        const reader = new FileReader();
+                        reader.onloadend = () => {
+                            const newMsg = {
+                                id: 'm_' + Date.now(),
+                                senderId: currentUser.id,
+                                senderName: currentUser.name,
+                                type: 'audio',
+                                content: reader.result,
+                                timestamp: getCurrentTime()
+                            };
+                            messages.push(newMsg);
+                            saveData();
+                            renderMessages();
+                        };
+                        reader.readAsDataURL(audioBlob);
+                    }
+                };
+
+                mediaRecorder.start();
+                isRecording = true;
+
+                document.getElementById('recordingStatus').classList.remove('hidden');
+                micBtn.classList.replace('bg-gray-800', 'bg-red-600');
+                micBtn.classList.replace('text-waGreen', 'text-white');
+
+                recordStartTime = Date.now();
+                recordTimerInterval = setInterval(updateRecordingTimer, 1000);
+
+            } catch (err) {
+                alert("Microphone permission denied or not supported.");
+            }
+        }
+
+        function stopAudioRecording() {
+            if (mediaRecorder && isRecording) {
+                mediaRecorder.stop();
+                isRecording = false;
+                clearInterval(recordTimerInterval);
+                document.getElementById('recordingStatus').classList.add('hidden');
+                micBtn.classList.replace('bg-red-600', 'bg-gray-800');
+                micBtn.classList.replace('text-white', 'text-waGreen');
+            }
+        }
+
+        function updateRecordingTimer() {
+            const diff = Math.floor((Date.now() - recordStartTime) / 1000);
+            const mins = Math.floor(diff / 60);
+            const secs = diff % 60;
+            document.getElementById('recordingTimer').textContent = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+
+        // --- LIVE CAMERA SNAP ---
+        openCameraBtn.addEventListener('click', async () => {
+            try {
+                cameraStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                cameraVideo.srcObject = cameraStream;
+                cameraModal.classList.remove('hidden');
+            } catch (err) {
+                alert("Camera access was denied or device is unavailable.");
+            }
+        });
+
+        closeCameraBtn.addEventListener('click', stopCamera);
+
+        function stopCamera() {
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(track => track.stop());
+                cameraStream = null;
+            }
+            cameraModal.classList.add('hidden');
+        }
+
+        capturePhotoBtn.addEventListener('click', () => {
+            if (!cameraStream || !currentUser) return;
+
+            cameraCanvas.width = cameraVideo.videoWidth || 640;
+            cameraCanvas.height = cameraVideo.videoHeight || 480;
+            const ctx = cameraCanvas.getContext('2d');
+            ctx.drawImage(cameraVideo, 0, 0, cameraCanvas.width, cameraCanvas.height);
+
+            const imageData = cameraCanvas.toDataURL('image/png');
+            const newMsg = {
+                id: 'm_' + Date.now(),
+                senderId: currentUser.id,
+                senderName: currentUser.name,
+                type: 'image',
+                content: imageData,
+                timestamp: getCurrentTime()
+            };
+
+            messages.push(newMsg);
+            saveData();
+            renderMessages();
+            stopCamera();
+        });
+
+        // --- MEMBERS MODAL & SWITCH USER ---
+        toggleMembersModalBtn.addEventListener('click', openMembersModal);
+        activeProfileBtn.addEventListener('click', openMembersModal);
+        closeMembersModalBtn.addEventListener('click', () => membersModal.classList.add('hidden'));
+
+        function openMembersModal() {
+            renderMembersList();
+            membersModal.classList.remove('hidden');
+        }
+
+        function renderMembersList() {
+            membersListContainer.innerHTML = '';
+
+            if (registeredMembers.length === 0) {
+                membersListContainer.innerHTML = '<p class="text-xs text-gray-500 text-center py-4">No members registered yet.</p>';
+                return;
+            }
+
+            registeredMembers.forEach((member) => {
+                const isCurrent = currentUser && member.id === currentUser.id;
+                const item = document.createElement('div');
+                item.className = `flex items-center justify-between p-3 rounded-2xl border ${
+                    isCurrent ? 'bg-emerald-950/40 border-emerald-500/50' : 'bg-waDark border-gray-800'
+                }`;
+
+                item.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <img src="${member.avatar}" class="w-10 h-10 rounded-full object-cover border border-gray-700">
+                        <div>
+                            <h4 class="text-sm font-bold text-white flex items-center gap-1.5">
+                                <span>${escapeHtml(member.name)}</span>
+                                ${isCurrent ? '<span class="text-[10px] bg-emerald-900 text-emerald-300 px-2 py-0.5 rounded-full font-mono">You</span>' : ''}
+                            </h4>
+                            <p class="text-xs text-gray-400 font-mono">${escapeHtml(member.contact)}</p>
+                        </div>
+                    </div>
+                    ${!isCurrent ? `
+                        <button class="switchUserBtn text-xs text-gray-400 hover:text-emerald-400 bg-gray-800 px-2.5 py-1 rounded-lg border border-gray-700" data-id="${member.id}">
+                            Switch
+                        </button>
+                    ` : ''}
+                `;
+
+                membersListContainer.appendChild(item);
+            });
+
+            membersListContainer.querySelectorAll('.switchUserBtn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const targetId = e.target.getAttribute('data-id');
+                    const targetUser = registeredMembers.find(m => m.id === targetId);
+                    if (targetUser) {
+                        currentUser = targetUser;
+                        saveData();
+                        updateAppHeaderUI();
+                        renderMessages();
+                        membersModal.classList.add('hidden');
+                    }
+                });
+            });
+        }
+
+        addNewMemberBtn.addEventListener('click', () => {
+            membersModal.classList.add('hidden');
+            mainApp.classList.add('hidden');
+            regName.value = '';
+            regContact.value = '';
+            joinScreen.classList.remove('hidden');
+        });
+
+        resetAppBtn.addEventListener('click', () => {
+            if (confirm("Are you sure you want to reset all data, stories, and members?")) {
+                localStorage.removeItem('ma_members');
+                localStorage.removeItem('ma_messages');
+                localStorage.removeItem('ma_statuses');
+                localStorage.removeItem('ma_current_user');
+                registeredMembers = [];
+                messages = [];
+                statuses = [];
+                currentUser = null;
+                location.reload();
+            }
+        });
+
+        // --- CALL SIMULATION ---
+        startAudioCallBtn.addEventListener('click', () => startCall('voice'));
+        startVideoCallBtn.addEventListener('click', () => startCall('video'));
+        endCallBtn.addEventListener('click', endCall);
+
+        async function startCall(type) {
+            callModal.classList.remove('hidden');
+            callTitle.textContent = type === 'video' ? 'MA Group Video Call' : 'MA Group Voice Call';
+            callStatusText.textContent = 'Calling group members...';
+
+            if (type === 'video') {
+                callVideoContainer.classList.remove('hidden');
+                try {
+                    callStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                    document.getElementById('selfCallVideo').srcObject = callStream;
+                    document.getElementById('remoteCallVideo').srcObject = callStream;
+                } catch (err) {
+                    console.warn("Call stream warning:", err);
+                }
+            } else {
+                callVideoContainer.classList.add('hidden');
+                try {
+                    callStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                } catch (err) {
+                    console.warn("Audio stream warning:", err);
+                }
+            }
+
+            setTimeout(() => {
+                callStatusText.textContent = 'Connected • 00:01';
+            }, 2500);
+        }
+
+        function endCall() {
+            if (callStream) {
+                callStream.getTracks().forEach(track => track.stop());
+                callStream = null;
+            }
+            callModal.classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
