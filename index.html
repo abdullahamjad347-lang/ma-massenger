@@ -1,0 +1,2649 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-950 text-gray-100">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>MA Messenger - MA Productions</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<script>
+tailwind.config = {
+    darkMode: "class",
+    theme: {
+        extend: {
+            colors: {
+                waDark:"#0b141a",
+                waPanel:"#111b21",
+                waCard:"#202c33",
+                waIncoming:"#202c33",
+                waOutgoing:"#005c4b",
+                waGreen:"#00a884",
+                waAccent:"#25d366",
+                waHeader:"#202c33"
+            }
+        }
+    }
+}
+</script>
+
+<style>
+::-webkit-scrollbar{
+    width:5px;
+    height:5px;
+}
+::-webkit-scrollbar-thumb{
+    background:rgba(255,255,255,.15);
+    border-radius:5px;
+}
+.chat-bg{
+    background:#0b141a;
+    background-image:radial-gradient(#1f2c34 1px,transparent 0);
+    background-size:18px 18px;
+}
+.nav-active{
+    background:#064e3b;
+    color:#34d399;
+}
+.message-menu{
+    animation:fadeIn .15s ease;
+}
+@keyframes fadeIn{
+    from{opacity:0;transform:scale(.96)}
+    to{opacity:1;transform:scale(1)}
+}
+</style>
+</head>
+
+<body class="h-full bg-waDark text-gray-100 overflow-hidden">
+
+<!-- =========================================================
+ SPLASH
+========================================================= -->
+
+<div id="splashScreen"
+class="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-between py-16">
+
+    <div></div>
+
+    <div class="text-center">
+        <div class="w-24 h-24 mx-auto rounded-3xl
+        bg-gradient-to-br from-emerald-700 via-emerald-500 to-teal-400
+        flex items-center justify-center shadow-2xl mb-6">
+
+            <i class="fa-brands fa-whatsapp text-white text-6xl"></i>
+
+        </div>
+
+        <h1 class="text-3xl font-extrabold">
+            MA Messenger
+        </h1>
+
+        <p class="text-xs text-emerald-400 mt-2 tracking-widest uppercase">
+            Private Group Chat Network
+        </p>
+    </div>
+
+    <div class="text-center">
+        <p class="text-[10px] text-gray-500 tracking-widest">
+            POWERED BY
+        </p>
+
+        <p class="text-lg font-bold text-emerald-400 tracking-widest">
+            MA PRODUCTIONS
+        </p>
+    </div>
+</div>
+
+
+<!-- =========================================================
+ SECURITY SCREEN
+========================================================= -->
+
+<div id="secretScreen"
+class="fixed inset-0 z-[90] bg-gray-950 flex items-center justify-center p-4">
+
+    <div class="w-full max-w-md bg-waPanel p-8 rounded-3xl
+    border border-gray-800 shadow-2xl text-center">
+
+        <div class="w-20 h-20 mx-auto rounded-3xl
+        bg-emerald-950 border border-emerald-500/30
+        flex items-center justify-center text-emerald-400 text-3xl mb-5">
+
+            <i class="fa-solid fa-lock"></i>
+
+        </div>
+
+        <h2 class="text-2xl font-bold">
+            Security Verification
+        </h2>
+
+        <p class="text-xs text-gray-400 mt-2 mb-6">
+            Enter the secret passcode provided by MA Productions.
+        </p>
+
+        <div class="relative">
+
+            <input id="secretCodeInput"
+            type="password"
+            placeholder="Enter Secret Code"
+            class="w-full bg-waDark border border-gray-700
+            rounded-xl px-4 py-3 text-center
+            tracking-widest outline-none focus:border-waGreen">
+
+            <button id="toggleShowCode"
+            class="absolute right-3 top-3 text-gray-400">
+
+                <i class="fa-regular fa-eye"></i>
+
+            </button>
+
+        </div>
+
+        <div id="codeError"
+        class="hidden mt-3 bg-red-950/50 border border-red-800
+        text-red-400 text-xs p-2 rounded-xl">
+
+            Wrong passcode. Access denied.
+
+        </div>
+
+        <button id="verifyCodeBtn"
+        class="w-full mt-5 py-3 rounded-xl
+        bg-waGreen text-waDark font-bold">
+
+            Verify Access
+            <i class="fa-solid fa-arrow-right ml-2"></i>
+
+        </button>
+
+    </div>
+</div>
+
+
+<!-- =========================================================
+ REGISTRATION
+========================================================= -->
+
+<div id="joinScreen"
+class="hidden fixed inset-0 z-[80] bg-gray-950
+items-center justify-center p-4 overflow-y-auto">
+
+<div class="w-full max-w-md bg-waPanel rounded-3xl
+border border-gray-800 p-7">
+
+    <div class="text-center mb-6">
+
+        <div class="w-14 h-14 mx-auto rounded-2xl
+        bg-emerald-950 text-emerald-400
+        flex items-center justify-center text-xl mb-3">
+
+            <i class="fa-solid fa-user-plus"></i>
+
+        </div>
+
+        <h2 class="text-2xl font-bold">
+            Join MA Messenger
+        </h2>
+
+        <p class="text-xs text-gray-400 mt-1">
+            Create your member profile.
+        </p>
+
+    </div>
+
+    <form id="registerForm" class="space-y-4">
+
+        <div>
+
+            <label class="text-xs text-gray-300">
+                Profile Picture
+            </label>
+
+            <div class="flex gap-2 mt-2">
+
+                <button type="button"
+                id="modeGhibliBtn"
+                class="flex-1 py-2 rounded-xl border
+                border-waGreen bg-emerald-950
+                text-emerald-300 text-xs font-bold">
+
+                    Cartoon Avatar
+
+                </button>
+
+                <button type="button"
+                id="modeUploadBtn"
+                class="flex-1 py-2 rounded-xl border
+                border-gray-700 bg-waDark
+                text-gray-400 text-xs font-bold">
+
+                    Upload Photo
+
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div id="ghibliAvatarSection"
+        class="bg-waDark border border-gray-800
+        rounded-2xl p-3">
+
+            <p class="text-[11px] text-gray-400 mb-2">
+                Select avatar
+            </p>
+
+            <div id="ghibliGrid"
+            class="grid grid-cols-4 gap-2"></div>
+
+        </div>
+
+
+        <div id="uploadAvatarSection"
+        class="hidden bg-waDark border border-gray-800
+        rounded-2xl p-5 text-center">
+
+            <div class="w-20 h-20 rounded-full mx-auto
+            border-2 border-dashed border-emerald-500/50
+            overflow-hidden flex items-center justify-center">
+
+                <img id="uploadPreviewImg"
+                class="hidden w-full h-full object-cover">
+
+                <i id="uploadPreviewIcon"
+                class="fa-solid fa-camera text-2xl text-emerald-400"></i>
+
+            </div>
+
+            <label class="inline-block mt-3
+            bg-emerald-950 text-emerald-400
+            px-4 py-2 rounded-xl text-xs font-bold cursor-pointer">
+
+                Choose Photo
+
+                <input id="customAvatarInput"
+                type="file"
+                accept="image/*"
+                class="hidden">
+
+            </label>
+
+        </div>
+
+
+        <div>
+
+            <label class="text-xs text-gray-300">
+                Full Name
+            </label>
+
+            <input id="regName"
+            required
+            class="w-full mt-1 bg-waDark
+            border border-gray-700 rounded-xl
+            px-4 py-3 outline-none focus:border-waGreen"
+            placeholder="Your full name">
+
+        </div>
+
+
+        <div>
+
+            <label class="text-xs text-gray-300">
+                Mobile / Email
+            </label>
+
+            <input id="regContact"
+            required
+            class="w-full mt-1 bg-waDark
+            border border-gray-700 rounded-xl
+            px-4 py-3 outline-none focus:border-waGreen"
+            placeholder="+92... or email">
+
+        </div>
+
+
+        <div id="joinError"
+        class="hidden bg-red-950/50
+        border border-red-800 text-red-400
+        text-xs p-2 rounded-xl text-center">
+
+            Please fill all required fields.
+
+        </div>
+
+
+        <button
+        class="w-full py-3.5 rounded-xl
+        bg-waGreen text-waDark font-bold">
+
+            <i class="fa-solid fa-right-to-bracket mr-2"></i>
+            Join Messenger
+
+        </button>
+
+    </form>
+</div>
+</div>
+
+
+<!-- =========================================================
+ MAIN APPLICATION
+========================================================= -->
+
+<div id="mainApp"
+class="hidden h-full max-w-6xl mx-auto
+bg-waDark border-x border-gray-800">
+
+<div class="h-full flex flex-col">
+
+
+<!-- HEADER -->
+
+<header class="bg-waHeader border-b border-gray-800
+px-4 py-3 flex items-center justify-between">
+
+    <div class="flex items-center gap-3">
+
+        <div class="w-11 h-11 rounded-2xl
+        bg-gradient-to-br from-emerald-700 to-teal-900
+        flex items-center justify-center">
+
+            <i class="fa-solid fa-comments"></i>
+
+        </div>
+
+        <div>
+
+            <h1 class="font-bold">
+                MA Messenger
+            </h1>
+
+            <p id="memberCounter"
+            class="text-xs text-emerald-400">
+                0 Members
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="flex items-center gap-2">
+
+        <button id="profileBtn"
+        class="flex items-center gap-2
+        bg-gray-800 px-2 py-1.5 rounded-xl">
+
+            <img id="currentUserAvatar"
+            class="w-7 h-7 rounded-full object-cover">
+
+            <span id="currentUserName"
+            class="hidden sm:block text-xs font-bold">
+                Member
+            </span>
+
+        </button>
+
+    </div>
+
+</header>
+
+
+<!-- =========================================================
+ APP CONTENT
+========================================================= -->
+
+<div class="flex-1 flex min-h-0">
+
+
+<!-- SIDEBAR -->
+
+<aside class="w-[72px] sm:w-60 bg-waPanel
+border-r border-gray-800 flex flex-col">
+
+    <nav class="p-2 space-y-2">
+
+        <button
+        data-section="group"
+        class="navBtn nav-active w-full p-3 rounded-xl
+        flex items-center gap-3">
+
+            <i class="fa-solid fa-users"></i>
+
+            <span class="hidden sm:block text-xs font-bold">
+                Chat with Group
+            </span>
+
+        </button>
+
+
+        <button
+        data-section="friends"
+        class="navBtn w-full p-3 rounded-xl
+        flex items-center gap-3 text-gray-400">
+
+            <i class="fa-solid fa-user-group"></i>
+
+            <span class="hidden sm:block text-xs font-bold">
+                Chat with Friends
+            </span>
+
+        </button>
+
+
+        <button
+        data-section="media"
+        class="navBtn w-full p-3 rounded-xl
+        flex items-center gap-3 text-gray-400">
+
+            <i class="fa-solid fa-photo-film"></i>
+
+            <span class="hidden sm:block text-xs font-bold">
+                Media Files
+            </span>
+
+        </button>
+
+
+        <button
+        data-section="saved"
+        class="navBtn w-full p-3 rounded-xl
+        flex items-center gap-3 text-gray-400">
+
+            <i class="fa-solid fa-star"></i>
+
+            <span class="hidden sm:block text-xs font-bold">
+                Saved Messages
+            </span>
+
+        </button>
+
+    </nav>
+
+
+    <div class="mt-auto p-2">
+
+        <button id="ownerPanelBtn"
+        class="hidden w-full p-3 rounded-xl
+        text-red-400 hover:bg-red-950/40
+        flex items-center gap-3">
+
+            <i class="fa-solid fa-shield-halved"></i>
+
+            <span class="hidden sm:block text-xs font-bold">
+                Owner Panel
+            </span>
+
+        </button>
+
+    </div>
+
+</aside>
+
+
+<!-- MAIN PANEL -->
+
+<section class="flex-1 min-w-0 flex flex-col">
+
+
+<!-- GROUP SECTION -->
+
+<div id="groupSection"
+class="section flex-1 flex flex-col min-h-0">
+
+    <div class="bg-waPanel border-b border-gray-800
+    px-4 py-3">
+
+        <h2 class="font-bold">
+            MA Productions Group
+        </h2>
+
+        <p class="text-[11px] text-gray-500">
+            All registered members
+        </p>
+
+    </div>
+
+
+    <main id="groupMessages"
+    class="chat-bg flex-1 overflow-y-auto p-4 space-y-3">
+    </main>
+
+
+    <footer class="bg-waHeader border-t border-gray-800 p-3">
+
+        <div class="flex gap-2">
+
+            <label class="p-3 text-gray-400 cursor-pointer">
+                <i class="fa-solid fa-image text-lg"></i>
+                <input id="groupImageInput"
+                type="file"
+                accept="image/*"
+                class="hidden">
+            </label>
+
+            <label class="p-3 text-gray-400 cursor-pointer">
+                <i class="fa-solid fa-video text-lg"></i>
+                <input id="groupVideoInput"
+                type="file"
+                accept="video/*"
+                class="hidden">
+            </label>
+
+            <input id="groupMessageInput"
+            class="flex-1 bg-waDark border border-gray-700
+            rounded-2xl px-4 outline-none focus:border-waGreen"
+            placeholder="Type a message...">
+
+            <button id="groupSendBtn"
+            class="w-12 h-12 rounded-full
+            bg-waGreen text-waDark">
+
+                <i class="fa-solid fa-paper-plane"></i>
+
+            </button>
+
+        </div>
+
+    </footer>
+
+</div>
+
+
+<!-- FRIENDS SECTION -->
+
+<div id="friendsSection"
+class="section hidden flex-1 flex min-h-0">
+
+
+<div id="friendsList"
+class="w-full sm:w-72 bg-waPanel
+border-r border-gray-800 overflow-y-auto">
+
+    <div class="p-4 border-b border-gray-800">
+
+        <h2 class="font-bold">
+            Friends
+        </h2>
+
+        <p class="text-[11px] text-gray-500">
+            Select a member for private chat
+        </p>
+
+    </div>
+
+</div>
+
+
+<div id="privateChat"
+class="hidden sm:flex flex-1 flex-col min-w-0">
+
+    <div id="privateHeader"
+    class="bg-waPanel border-b border-gray-800
+    p-3 flex items-center gap-3">
+
+        <div class="w-10 h-10 rounded-full
+        bg-gray-800 flex items-center justify-center">
+
+            <i class="fa-solid fa-user"></i>
+
+        </div>
+
+        <div>
+
+            <h3 id="privateFriendName"
+            class="font-bold text-sm">
+                Select a friend
+            </h3>
+
+            <p class="text-[10px] text-gray-500">
+                Private conversation
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <main id="privateMessages"
+    class="chat-bg flex-1 overflow-y-auto p-4 space-y-3">
+    </main>
+
+
+    <footer class="bg-waHeader border-t border-gray-800 p-3">
+
+        <div class="flex gap-2">
+
+            <label class="p-3 text-gray-400 cursor-pointer">
+
+                <i class="fa-solid fa-image"></i>
+
+                <input id="privateImageInput"
+                type="file"
+                accept="image/*"
+                class="hidden">
+
+            </label>
+
+            <input id="privateMessageInput"
+            class="flex-1 bg-waDark border border-gray-700
+            rounded-2xl px-4 outline-none
+            focus:border-waGreen"
+            placeholder="Private message...">
+
+            <button id="privateSendBtn"
+            class="w-12 h-12 rounded-full
+            bg-waGreen text-waDark">
+
+                <i class="fa-solid fa-paper-plane"></i>
+
+            </button>
+
+        </div>
+
+    </footer>
+
+</div>
+
+</div>
+
+
+<!-- MEDIA SECTION -->
+
+<div id="mediaSection"
+class="section hidden flex-1 overflow-y-auto p-4">
+
+    <div class="mb-5">
+
+        <h2 class="text-xl font-bold">
+            Media Files
+        </h2>
+
+        <p class="text-xs text-gray-500">
+            All images and videos shared in conversations.
+        </p>
+
+    </div>
+
+    <div id="mediaGrid"
+    class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+    </div>
+
+</div>
+
+
+<!-- SAVED SECTION -->
+
+<div id="savedSection"
+class="section hidden flex-1 overflow-y-auto p-4">
+
+    <div class="mb-5">
+
+        <h2 class="text-xl font-bold">
+            Saved Messages
+        </h2>
+
+        <p class="text-xs text-gray-500">
+            Your starred messages.
+        </p>
+
+    </div>
+
+    <div id="savedMessages"
+    class="space-y-3">
+    </div>
+
+</div>
+
+
+</section>
+</div>
+</div>
+</div>
+
+
+<!-- =========================================================
+ OWNER PANEL
+========================================================= -->
+
+<div id="ownerModal"
+class="hidden fixed inset-0 z-[200]
+bg-black/80 backdrop-blur-sm
+items-center justify-center p-4">
+
+<div class="w-full max-w-md bg-waPanel
+border border-gray-800 rounded-3xl p-6">
+
+    <div class="flex justify-between items-center mb-5">
+
+        <div>
+
+            <h2 class="font-bold text-lg">
+                Owner Panel
+            </h2>
+
+            <p class="text-xs text-gray-500">
+                Restricted controls
+            </p>
+
+        </div>
+
+        <button id="closeOwnerModal"
+        class="text-gray-400">
+
+            <i class="fa-solid fa-xmark text-xl"></i>
+
+        </button>
+
+    </div>
+
+
+    <div class="bg-emerald-950/40
+    border border-emerald-800 rounded-2xl p-4 mb-4">
+
+        <p class="text-xs text-emerald-300">
+            <i class="fa-solid fa-shield-halved mr-1"></i>
+            Owner controls only
+        </p>
+
+    </div>
+
+
+    <div class="space-y-3">
+
+        <button id="ownerResetBtn"
+        class="w-full p-3 rounded-xl
+        bg-red-950/50 border border-red-800
+        text-red-400 text-sm font-bold">
+
+            <i class="fa-solid fa-trash-can mr-2"></i>
+            Reset All Application Data
+
+        </button>
+
+    </div>
+
+</div>
+</div>
+
+
+<!-- =========================================================
+ MESSAGE CONTEXT MENU
+========================================================= -->
+
+<div id="messageMenu"
+class="hidden fixed z-[300]
+bg-waPanel border border-gray-700
+rounded-xl shadow-2xl p-2">
+
+    <button id="menuDeleteBtn"
+    class="block w-full text-left
+    px-4 py-2 rounded-lg
+    text-red-400 hover:bg-red-950/40 text-xs">
+
+        <i class="fa-solid fa-trash mr-2"></i>
+        Delete Message
+
+    </button>
+
+    <button id="menuStarBtn"
+    class="block w-full text-left
+    px-4 py-2 rounded-lg
+    text-yellow-400 hover:bg-gray-800 text-xs">
+
+        <i class="fa-solid fa-star mr-2"></i>
+        Star Message
+
+    </button>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+ CONFIGURATION
+========================================================= */
+
+const SECRET_CODE = "Moaz@511";
+
+const STORAGE = {
+    members:"ma_members_v4",
+    messages:"ma_messages_v4",
+    privateMessages:"ma_private_messages_v4",
+    currentUser:"ma_current_user_v4",
+    owner:"ma_owner_id_v4"
+};
+
+
+/* =========================================================
+ AVATARS
+========================================================= */
+
+const AVATARS = [
+
+"https://api.dicebear.com/7.x/adventurer/svg?seed=Totoro",
+
+"https://api.dicebear.com/7.x/adventurer/svg?seed=Chihiro",
+
+"https://api.dicebear.com/7.x/adventurer/svg?seed=Howl",
+
+"https://api.dicebear.com/7.x/adventurer/svg?seed=Kiki",
+
+"https://api.dicebear.com/7.x/adventurer/svg?seed=Ponyo",
+
+"https://api.dicebear.com/7.x/adventurer/svg?seed=Mononoke",
+
+"https://api.dicebear.com/7.x/bottts/svg?seed=Calcifer",
+
+"https://api.dicebear.com/7.x/bottts/svg?seed=NoFace"
+
+];
+
+
+/* =========================================================
+ STATE
+========================================================= */
+
+let members = [];
+let groupMessages = [];
+let privateMessages = {};
+
+let currentUser = null;
+let ownerId = null;
+
+let selectedAvatar = AVATARS[0];
+let avatarMode = "cartoon";
+let uploadedAvatar = "";
+
+let selectedFriend = null;
+let selectedMessageId = null;
+
+
+/* =========================================================
+ DOM
+========================================================= */
+
+const splashScreen =
+document.getElementById("splashScreen");
+
+const secretScreen =
+document.getElementById("secretScreen");
+
+const joinScreen =
+document.getElementById("joinScreen");
+
+const mainApp =
+document.getElementById("mainApp");
+
+const secretInput =
+document.getElementById("secretCodeInput");
+
+const secretError =
+document.getElementById("codeError");
+
+
+/* =========================================================
+ LOAD DATA
+========================================================= */
+
+function loadData(){
+
+    try{
+        members =
+        JSON.parse(localStorage.getItem(STORAGE.members)) || [];
+    }catch{
+        members=[];
+    }
+
+    try{
+        groupMessages =
+        JSON.parse(localStorage.getItem(STORAGE.messages)) || [];
+    }catch{
+        groupMessages=[];
+    }
+
+    try{
+        privateMessages =
+        JSON.parse(localStorage.getItem(STORAGE.privateMessages)) || {};
+    }catch{
+        privateMessages={};
+    }
+
+    try{
+        currentUser =
+        JSON.parse(localStorage.getItem(STORAGE.currentUser)) || null;
+    }catch{
+        currentUser=null;
+    }
+
+    ownerId =
+    localStorage.getItem(STORAGE.owner) || null;
+}
+
+
+/* =========================================================
+ SAVE
+========================================================= */
+
+function saveData(){
+
+    localStorage.setItem(
+        STORAGE.members,
+        JSON.stringify(members)
+    );
+
+    localStorage.setItem(
+        STORAGE.messages,
+        JSON.stringify(groupMessages)
+    );
+
+    localStorage.setItem(
+        STORAGE.privateMessages,
+        JSON.stringify(privateMessages)
+    );
+
+    if(currentUser){
+
+        localStorage.setItem(
+            STORAGE.currentUser,
+            JSON.stringify(currentUser)
+        );
+
+    }
+
+    if(ownerId){
+
+        localStorage.setItem(
+            STORAGE.owner,
+            ownerId
+        );
+
+    }
+}
+
+
+/* =========================================================
+ HELPERS
+========================================================= */
+
+function escapeHTML(value){
+
+    return String(value || "")
+    .replace(/[&<>"']/g,m=>({
+
+        "&":"&amp;",
+        "<":"&lt;",
+        ">":"&gt;",
+        '"':"&quot;",
+        "'":"&#039;"
+
+    }[m]));
+
+}
+
+
+function timeNow(){
+
+    return new Date().toLocaleTimeString([],{
+        hour:"2-digit",
+        minute:"2-digit"
+    });
+
+}
+
+
+function makeId(prefix){
+
+    return prefix + "_" +
+    Date.now() + "_" +
+    Math.random().toString(36).slice(2,8);
+
+}
+
+
+function isOwner(){
+
+    return currentUser &&
+    ownerId &&
+    currentUser.id === ownerId;
+
+}
+
+
+/* =========================================================
+ SPLASH
+========================================================= */
+
+window.addEventListener("DOMContentLoaded",()=>{
+
+    loadData();
+    renderAvatarGrid();
+
+    setTimeout(()=>{
+
+        splashScreen.classList.add("opacity-0");
+
+        setTimeout(()=>{
+
+            splashScreen.classList.add("hidden");
+
+        },500);
+
+    },1200);
+
+});
+
+
+/* =========================================================
+ SECRET VERIFICATION
+========================================================= */
+
+document.getElementById("toggleShowCode")
+.addEventListener("click",()=>{
+
+    secretInput.type =
+    secretInput.type === "password"
+    ? "text"
+    : "password";
+
+});
+
+
+document.getElementById("verifyCodeBtn")
+.addEventListener("click",verifyCode);
+
+
+secretInput.addEventListener("keydown",e=>{
+
+    if(e.key==="Enter"){
+        verifyCode();
+    }
+
+});
+
+
+function verifyCode(){
+
+    if(secretInput.value.trim() !== SECRET_CODE){
+
+        secretError.classList.remove("hidden");
+        return;
+
+    }
+
+    secretError.classList.add("hidden");
+    secretScreen.classList.add("hidden");
+
+
+    /*
+        IMPORTANT:
+        Existing registered user does NOT see
+        registration screen again.
+    */
+
+    if(
+        currentUser &&
+        members.some(m=>m.id===currentUser.id)
+    ){
+
+        openApp();
+
+    }else{
+
+        joinScreen.classList.remove("hidden");
+        joinScreen.classList.add("flex");
+
+    }
+
+}
+
+
+/* =========================================================
+ AVATAR MODE
+========================================================= */
+
+const ghibliSection =
+document.getElementById("ghibliAvatarSection");
+
+const uploadSection =
+document.getElementById("uploadAvatarSection");
+
+
+document.getElementById("modeGhibliBtn")
+.addEventListener("click",()=>{
+
+    avatarMode="cartoon";
+
+    ghibliSection.classList.remove("hidden");
+    uploadSection.classList.add("hidden");
+
+});
+
+
+document.getElementById("modeUploadBtn")
+.addEventListener("click",()=>{
+
+    avatarMode="upload";
+
+    ghibliSection.classList.add("hidden");
+    uploadSection.classList.remove("hidden");
+
+});
+
+
+function renderAvatarGrid(){
+
+    const grid =
+    document.getElementById("ghibliGrid");
+
+    grid.innerHTML="";
+
+    AVATARS.forEach(url=>{
+
+        const img =
+        document.createElement("img");
+
+        img.src=url;
+
+        img.className =
+        "w-14 h-14 rounded-2xl p-1 bg-gray-900 border-2 cursor-pointer " +
+        (url===selectedAvatar
+        ?"border-waGreen"
+        :"border-gray-800 opacity-60");
+
+        img.onclick=()=>{
+
+            selectedAvatar=url;
+            renderAvatarGrid();
+
+        };
+
+        grid.appendChild(img);
+
+    });
+
+}
+
+
+/* =========================================================
+ UPLOAD AVATAR
+========================================================= */
+
+document.getElementById("customAvatarInput")
+.addEventListener("change",e=>{
+
+    const file=e.target.files[0];
+
+    if(!file)return;
+
+    const reader=new FileReader();
+
+    reader.onload=ev=>{
+
+        uploadedAvatar=ev.target.result;
+
+        const img =
+        document.getElementById("uploadPreviewImg");
+
+        img.src=uploadedAvatar;
+        img.classList.remove("hidden");
+
+        document
+        .getElementById("uploadPreviewIcon")
+        .classList.add("hidden");
+
+    };
+
+    reader.readAsDataURL(file);
+
+});
+
+
+/* =========================================================
+ REGISTRATION
+========================================================= */
+
+document.getElementById("registerForm")
+.addEventListener("submit",e=>{
+
+    e.preventDefault();
+
+    const name =
+    document.getElementById("regName")
+    .value.trim();
+
+    const contact =
+    document.getElementById("regContact")
+    .value.trim();
+
+    if(!name || !contact){
+
+        document
+        .getElementById("joinError")
+        .classList.remove("hidden");
+
+        return;
+
+    }
+
+
+    let avatar=selectedAvatar;
+
+    if(avatarMode==="upload"){
+
+        if(!uploadedAvatar){
+
+            alert("Please select a profile picture.");
+            return;
+
+        }
+
+        avatar=uploadedAvatar;
+
+    }
+
+
+    /*
+        Prevent duplicate registration
+        from the same saved account.
+    */
+
+    if(currentUser &&
+       members.some(m=>m.id===currentUser.id)){
+
+        openApp();
+        return;
+
+    }
+
+
+    const member={
+
+        id:makeId("user"),
+
+        name:name,
+
+        contact:contact,
+
+        avatar:avatar,
+
+        joinedAt:new Date().toISOString()
+
+    };
+
+
+    /*
+        First registered member becomes owner.
+        Owner ID is stored permanently.
+    */
+
+    if(!ownerId){
+
+        ownerId=member.id;
+
+    }
+
+
+    members.push(member);
+
+    currentUser=member;
+
+    saveData();
+
+    joinScreen.classList.add("hidden");
+
+    joinScreen.classList.remove("flex");
+
+    openApp();
+
+});
+
+
+/* =========================================================
+ OPEN APP
+========================================================= */
+
+function openApp(){
+
+    mainApp.classList.remove("hidden");
+
+    updateHeader();
+
+    renderGroupMessages();
+
+    renderFriends();
+
+    renderMedia();
+
+    renderSaved();
+
+    showSection("group");
+
+    if(isOwner()){
+
+        document
+        .getElementById("ownerPanelBtn")
+        .classList.remove("hidden");
+
+    }
+
+}
+
+
+/* =========================================================
+ HEADER
+========================================================= */
+
+function updateHeader(){
+
+    if(!currentUser)return;
+
+    document
+    .getElementById("currentUserName")
+    .textContent=currentUser.name;
+
+    document
+    .getElementById("currentUserAvatar")
+    .src=currentUser.avatar;
+
+    document
+    .getElementById("memberCounter")
+    .textContent=
+    `${members.length} ${
+        members.length===1?"Member":"Members"
+    }`;
+
+}
+
+
+/* =========================================================
+ SECTIONS
+========================================================= */
+
+document.querySelectorAll(".navBtn")
+.forEach(btn=>{
+
+    btn.addEventListener("click",()=>{
+
+        showSection(btn.dataset.section);
+
+    });
+
+});
+
+
+function showSection(section){
+
+    document.querySelectorAll(".section")
+    .forEach(s=>s.classList.add("hidden"));
+
+    document
+    .getElementById(section+"Section")
+    .classList.remove("hidden");
+
+    document.querySelectorAll(".navBtn")
+    .forEach(btn=>{
+
+        btn.classList.remove("nav-active");
+
+    });
+
+    const active =
+    document.querySelector(
+        `[data-section="${section}"]`
+    );
+
+    if(active){
+        active.classList.add("nav-active");
+    }
+
+}
+
+
+/* =========================================================
+ GROUP CHAT
+========================================================= */
+
+document.getElementById("groupSendBtn")
+.addEventListener("click",sendGroupText);
+
+
+document.getElementById("groupMessageInput")
+.addEventListener("keydown",e=>{
+
+    if(e.key==="Enter"){
+        sendGroupText();
+    }
+
+});
+
+
+function sendGroupText(){
+
+    const input=
+    document.getElementById("groupMessageInput");
+
+    const text=input.value.trim();
+
+    if(!text || !currentUser)return;
+
+    groupMessages.push({
+
+        id:makeId("msg"),
+
+        senderId:currentUser.id,
+
+        senderName:currentUser.name,
+
+        senderAvatar:currentUser.avatar,
+
+        type:"text",
+
+        content:text,
+
+        timestamp:timeNow(),
+
+        createdAt:Date.now(),
+
+        starred:false
+
+    });
+
+    input.value="";
+
+    saveData();
+
+    renderGroupMessages();
+
+    renderSaved();
+
+});
+
+
+/* =========================================================
+ GROUP MEDIA
+========================================================= */
+
+document.getElementById("groupImageInput")
+.addEventListener("change",e=>
+handleMediaFile(e,"image","group"));
+
+
+document.getElementById("groupVideoInput")
+.addEventListener("change",e=>
+handleMediaFile(e,"video","group"));
+
+
+document.getElementById("privateImageInput")
+.addEventListener("change",e=>
+handleMediaFile(e,"image","private"));
+
+
+function handleMediaFile(event,type,location){
+
+    const file=event.target.files[0];
+
+    if(!file || !currentUser)return;
+
+    const reader=new FileReader();
+
+    reader.onload=ev=>{
+
+        const message={
+
+            id:makeId("media"),
+
+            senderId:currentUser.id,
+
+            senderName:currentUser.name,
+
+            senderAvatar:currentUser.avatar,
+
+            type:type,
+
+            content:ev.target.result,
+
+            timestamp:timeNow(),
+
+            createdAt:Date.now(),
+
+            starred:false
+
+        };
+
+
+        if(location==="group"){
+
+            groupMessages.push(message);
+
+        }else{
+
+            if(!selectedFriend)return;
+
+            const key=getChatKey(
+                currentUser.id,
+                selectedFriend.id
+            );
+
+            if(!privateMessages[key]){
+                privateMessages[key]=[];
+            }
+
+            privateMessages[key].push(message);
+
+        }
+
+
+        saveData();
+
+        renderGroupMessages();
+        renderPrivateMessages();
+        renderMedia();
+
+    };
+
+    reader.readAsDataURL(file);
+
+}
+
+
+/* =========================================================
+ RENDER GROUP MESSAGES
+========================================================= */
+
+function renderGroupMessages(){
+
+    const box=
+    document.getElementById("groupMessages");
+
+    box.innerHTML="";
+
+
+    if(groupMessages.length===0){
+
+        box.innerHTML=emptyState(
+            "No messages yet",
+            "Start the group conversation."
+        );
+
+        return;
+
+    }
+
+
+    groupMessages.forEach(msg=>{
+
+        box.appendChild(
+            createMessageElement(msg,false)
+        );
+
+    });
+
+
+    box.scrollTop=box.scrollHeight;
+
+}
+
+
+/* =========================================================
+ MESSAGE ELEMENT
+========================================================= */
+
+function createMessageElement(msg,isPrivate){
+
+    const mine =
+    currentUser &&
+    msg.senderId===currentUser.id;
+
+
+    const wrapper=
+    document.createElement("div");
+
+    wrapper.className=
+    `flex ${mine?"justify-end":"justify-start"}`;
+
+
+    const card=
+    document.createElement("div");
+
+    card.className=
+    `relative max-w-[85%] sm:max-w-[70%]
+    rounded-2xl px-3 py-2
+    ${mine
+    ?"bg-waOutgoing rounded-tr-none"
+    :"bg-waIncoming rounded-tl-none border border-gray-800"}`;
+
+
+    let html="";
+
+
+    if(!mine){
+
+        html+=`
+
+        <div class="flex items-center gap-2 mb-1">
+
+            <img src="${msg.senderAvatar}"
+            class="w-6 h-6 rounded-full">
+
+            <span class="text-xs font-bold text-emerald-400">
+                ${escapeHTML(msg.senderName)}
+            </span>
+
+        </div>
+
+        `;
+
+    }
+
+
+    if(msg.type==="text"){
+
+        html+=`
+
+        <p class="text-sm leading-relaxed break-words">
+            ${escapeHTML(msg.content)}
+        </p>
+
+        `;
+
+    }
+
+
+    if(msg.type==="image"){
+
+        html+=`
+
+        <img src="${msg.content}"
+        class="max-h-72 rounded-xl object-cover cursor-pointer"
+        onclick="openMediaPreview('${msg.content}','image')">
+
+        `;
+
+    }
+
+
+    if(msg.type==="video"){
+
+        html+=`
+
+        <video src="${msg.content}"
+        controls
+        class="max-h-72 rounded-xl">
+        </video>
+
+        `;
+
+    }
+
+
+    html+=`
+
+    <div class="flex justify-end items-center gap-2
+    mt-1 text-[10px] text-gray-400">
+
+        <span>${msg.timestamp}</span>
+
+        ${msg.starred
+        ?'<i class="fa-solid fa-star text-yellow-400"></i>'
+        :''}
+
+    </div>
+
+    `;
+
+
+    card.innerHTML=html;
+
+
+    /*
+        Right click menu
+        only provides Delete if current user
+        is the sender.
+    */
+
+    card.addEventListener("contextmenu",e=>{
+
+        e.preventDefault();
+
+        selectedMessageId=msg.id;
+
+        showMessageMenu(
+            e.clientX,
+            e.clientY,
+            msg,
+            isPrivate
+        );
+
+    });
+
+
+    wrapper.appendChild(card);
+
+    return wrapper;
+
+}
+
+
+/* =========================================================
+ MESSAGE MENU
+========================================================= */
+
+function showMessageMenu(x,y,msg,isPrivate){
+
+    const menu=
+    document.getElementById("messageMenu");
+
+    const deleteBtn=
+    document.getElementById("menuDeleteBtn");
+
+    /*
+        Delete button is ONLY available
+        for message owner.
+    */
+
+    if(currentUser &&
+       msg.senderId===currentUser.id){
+
+        deleteBtn.classList.remove("hidden");
+
+    }else{
+
+        deleteBtn.classList.add("hidden");
+
+    }
+
+
+    menu.style.left=Math.min(
+        x,
+        window.innerWidth-180
+    )+"px";
+
+    menu.style.top=Math.min(
+        y,
+        window.innerHeight-100
+    )+"px";
+
+    menu.classList.remove("hidden");
+
+
+    deleteBtn.onclick=()=>{
+
+        deleteMessage(
+            selectedMessageId,
+            isPrivate
+        );
+
+        menu.classList.add("hidden");
+
+    };
+
+
+    document.getElementById("menuStarBtn")
+    .onclick=()=>{
+
+        toggleStar(
+            selectedMessageId,
+            isPrivate
+        );
+
+        menu.classList.add("hidden");
+
+    };
+
+}
+
+
+document.addEventListener("click",e=>{
+
+    const menu=
+    document.getElementById("messageMenu");
+
+    if(!menu.contains(e.target)){
+
+        menu.classList.add("hidden");
+
+    }
+
+});
+
+
+/* =========================================================
+ DELETE MESSAGE
+========================================================= */
+
+function deleteMessage(id,isPrivate){
+
+    if(isPrivate){
+
+        if(!selectedFriend)return;
+
+        const key=
+        getChatKey(
+            currentUser.id,
+            selectedFriend.id
+        );
+
+        const arr=
+        privateMessages[key] || [];
+
+        const msg=
+        arr.find(m=>m.id===id);
+
+        /*
+            SECURITY RULE:
+            User can only delete their own message.
+        */
+
+        if(!msg ||
+           msg.senderId!==currentUser.id){
+
+            return;
+
+        }
+
+        privateMessages[key]=
+        arr.filter(m=>m.id!==id);
+
+    }else{
+
+        const msg=
+        groupMessages.find(m=>m.id===id);
+
+        if(!msg ||
+           msg.senderId!==currentUser.id){
+
+            return;
+
+        }
+
+        groupMessages=
+        groupMessages.filter(m=>m.id!==id);
+
+    }
+
+
+    saveData();
+
+    renderGroupMessages();
+    renderPrivateMessages();
+    renderMedia();
+    renderSaved();
+
+}
+
+
+/* =========================================================
+ STAR MESSAGE
+========================================================= */
+
+function toggleStar(id,isPrivate){
+
+    let msg=null;
+
+    if(isPrivate){
+
+        if(!selectedFriend)return;
+
+        const key=
+        getChatKey(
+            currentUser.id,
+            selectedFriend.id
+        );
+
+        msg=
+        (privateMessages[key]||[])
+        .find(m=>m.id===id);
+
+    }else{
+
+        msg=
+        groupMessages.find(m=>m.id===id);
+
+    }
+
+
+    if(!msg)return;
+
+    msg.starred=!msg.starred;
+
+    saveData();
+
+    renderGroupMessages();
+    renderPrivateMessages();
+    renderSaved();
+
+}
+
+
+/* =========================================================
+ FRIEND LIST
+========================================================= */
+
+function renderFriends(){
+
+    const box=
+    document.getElementById("friendsList");
+
+    box.innerHTML=`
+
+        <div class="p-4 border-b border-gray-800">
+
+            <h2 class="font-bold">
+                Friends
+            </h2>
+
+            <p class="text-[11px] text-gray-500">
+                Private 1-to-1 conversations
+            </p>
+
+        </div>
+
+    `;
+
+
+    const others=
+    members.filter(
+        m=>!currentUser || m.id!==currentUser.id
+    );
+
+
+    if(others.length===0){
+
+        box.innerHTML+=`
+
+        <div class="p-5 text-center text-xs text-gray-500">
+
+            No other members yet.
+
+        </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    others.forEach(member=>{
+
+        const btn=
+        document.createElement("button");
+
+        btn.className=
+        "w-full p-3 flex items-center gap-3 " +
+        "hover:bg-gray-800 border-b border-gray-800 text-left";
+
+
+        btn.innerHTML=`
+
+        <img src="${member.avatar}"
+        class="w-11 h-11 rounded-full object-cover">
+
+        <div class="min-w-0">
+
+            <p class="text-sm font-bold truncate">
+                ${escapeHTML(member.name)}
+            </p>
+
+            <p class="text-[10px] text-gray-500">
+                Private chat
+            </p>
+
+        </div>
+
+        `;
+
+
+        btn.onclick=()=>{
+
+            selectedFriend=member;
+
+            document
+            .getElementById("privateChat")
+            .classList.remove("hidden");
+
+            document
+            .getElementById("privateChat")
+            .classList.add("flex");
+
+            document
+            .getElementById("privateFriendName")
+            .textContent=member.name;
+
+            renderPrivateMessages();
+
+        };
+
+
+        box.appendChild(btn);
+
+    });
+
+}
+
+
+/* =========================================================
+ PRIVATE CHAT KEY
+========================================================= */
+
+function getChatKey(a,b){
+
+    return [a,b].sort().join("__");
+
+}
+
+
+/* =========================================================
+ PRIVATE TEXT MESSAGE
+========================================================= */
+
+document.getElementById("privateSendBtn")
+.addEventListener("click",sendPrivateText);
+
+
+document.getElementById("privateMessageInput")
+.addEventListener("keydown",e=>{
+
+    if(e.key==="Enter"){
+        sendPrivateText();
+    }
+
+});
+
+
+function sendPrivateText(){
+
+    if(!currentUser || !selectedFriend)return;
+
+    const input=
+    document.getElementById("privateMessageInput");
+
+    const text=input.value.trim();
+
+    if(!text)return;
+
+
+    const key=
+    getChatKey(
+        currentUser.id,
+        selectedFriend.id
+    );
+
+
+    if(!privateMessages[key]){
+        privateMessages[key]=[];
+    }
+
+
+    privateMessages[key].push({
+
+        id:makeId("private"),
+
+        senderId:currentUser.id,
+
+        senderName:currentUser.name,
+
+        senderAvatar:currentUser.avatar,
+
+        receiverId:selectedFriend.id,
+
+        type:"text",
+
+        content:text,
+
+        timestamp:timeNow(),
+
+        createdAt:Date.now(),
+
+        starred:false
+
+    });
+
+
+    input.value="";
+
+    saveData();
+
+    renderPrivateMessages();
+
+    renderSaved();
+
+}
+
+
+/* =========================================================
+ PRIVATE MESSAGES
+========================================================= */
+
+function renderPrivateMessages(){
+
+    const box=
+    document.getElementById("privateMessages");
+
+    box.innerHTML="";
+
+
+    if(!selectedFriend){
+
+        box.innerHTML=
+        emptyState(
+            "Select a friend",
+            "Choose a member to start a private conversation."
+        );
+
+        return;
+
+    }
+
+
+    const key=
+    getChatKey(
+        currentUser.id,
+        selectedFriend.id
+    );
+
+
+    const messages=
+    privateMessages[key] || [];
+
+
+    if(messages.length===0){
+
+        box.innerHTML=
+        emptyState(
+            "No private messages",
+            "Start your private conversation."
+        );
+
+        return;
+
+    }
+
+
+    messages.forEach(msg=>{
+
+        box.appendChild(
+            createMessageElement(msg,true)
+        );
+
+    });
+
+
+    box.scrollTop=box.scrollHeight;
+
+}
+
+
+/* =========================================================
+ MEDIA LIBRARY
+========================================================= */
+
+function renderMedia(){
+
+    const grid=
+    document.getElementById("mediaGrid");
+
+    grid.innerHTML="";
+
+
+    let all=[];
+
+
+    all=all.concat(
+        groupMessages.filter(
+            m=>m.type==="image" || m.type==="video"
+        )
+    );
+
+
+    Object.values(privateMessages)
+    .forEach(arr=>{
+
+        all=all.concat(
+            arr.filter(
+                m=>m.type==="image" ||
+                m.type==="video"
+            )
+        );
+
+    });
+
+
+    all.sort(
+        (a,b)=>
+        (b.createdAt||0)-
+        (a.createdAt||0)
+    );
+
+
+    if(all.length===0){
+
+        grid.innerHTML=`
+
+        <div class="col-span-full">
+
+            ${emptyState(
+                "No media files",
+                "Images and videos will appear here."
+            )}
+
+        </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    all.forEach(media=>{
+
+        const card=
+        document.createElement("div");
+
+        card.className=
+        "bg-waPanel rounded-2xl overflow-hidden " +
+        "border border-gray-800";
+
+
+        if(media.type==="image"){
+
+            card.innerHTML=`
+
+            <img src="${media.content}"
+            class="w-full h-40 object-cover cursor-pointer"
+            onclick="openMediaPreview('${media.content}','image')">
+
+            <div class="p-2 text-[10px] text-gray-400">
+
+                ${escapeHTML(media.senderName)}
+                • ${media.timestamp}
+
+            </div>
+
+            `;
+
+        }else{
+
+            card.innerHTML=`
+
+            <video src="${media.content}"
+            controls
+            class="w-full h-40 object-cover">
+            </video>
+
+            <div class="p-2 text-[10px] text-gray-400">
+
+                ${escapeHTML(media.senderName)}
+                • ${media.timestamp}
+
+            </div>
+
+            `;
+
+        }
+
+
+        grid.appendChild(card);
+
+    });
+
+}
+
+
+/* =========================================================
+ SAVED MESSAGES
+========================================================= */
+
+function renderSaved(){
+
+    const box=
+    document.getElementById("savedMessages");
+
+    box.innerHTML="";
+
+
+    let saved=[];
+
+
+    saved=saved.concat(
+        groupMessages
+        .filter(m=>m.starred)
+        .map(m=>({
+            ...m,
+            source:"Group Chat"
+        }))
+    );
+
+
+    Object.entries(privateMessages)
+    .forEach(([key,arr])=>{
+
+        arr.filter(m=>m.starred)
+        .forEach(m=>{
+
+            saved.push({
+
+                ...m,
+
+                source:"Private Chat"
+
+            });
+
+        });
+
+    });
+
+
+    if(saved.length===0){
+
+        box.innerHTML=
+        emptyState(
+            "Nothing saved",
+            "Star important messages to find them here."
+        );
+
+        return;
+
+    }
+
+
+    saved.sort(
+        (a,b)=>
+        (b.createdAt||0)-
+        (a.createdAt||0)
+    );
+
+
+    saved.forEach(msg=>{
+
+        const item=
+        document.createElement("div");
+
+        item.className=
+        "bg-waPanel border border-gray-800 " +
+        "rounded-2xl p-4";
+
+
+        item.innerHTML=`
+
+        <div class="flex items-center justify-between">
+
+            <div>
+
+                <p class="text-xs font-bold text-emerald-400">
+                    ${escapeHTML(msg.senderName)}
+                </p>
+
+                <p class="text-[10px] text-gray-500">
+                    ${msg.source} • ${msg.timestamp}
+                </p>
+
+            </div>
+
+            <i class="fa-solid fa-star text-yellow-400"></i>
+
+        </div>
+
+
+        <div class="mt-3 text-sm">
+
+            ${
+                msg.type==="text"
+                ?escapeHTML(msg.content)
+                :msg.type==="image"
+                ?`<img src="${msg.content}"
+                    class="max-h-48 rounded-xl">`
+                :`<video src="${msg.content}"
+                    controls
+                    class="max-h-48 rounded-xl"></video>`
+            }
+
+        </div>
+
+        `;
+
+
+        box.appendChild(item);
+
+    });
+
+}
+
+
+/* =========================================================
+ EMPTY STATE
+========================================================= */
+
+function emptyState(title,text){
+
+    return `
+
+    <div class="h-full min-h-48
+    flex items-center justify-center">
+
+        <div class="text-center p-6">
+
+            <div class="w-14 h-14 mx-auto
+            rounded-full bg-emerald-950
+            text-emerald-400 flex items-center
+            justify-center text-xl mb-3">
+
+                <i class="fa-solid fa-comments"></i>
+
+            </div>
+
+            <h3 class="font-bold text-white">
+                ${title}
+            </h3>
+
+            <p class="text-xs text-gray-500 mt-1">
+                ${text}
+            </p>
+
+        </div>
+
+    </div>
+
+    `;
+
+}
+
+
+/* =========================================================
+ OWNER PANEL
+========================================================= */
+
+document.getElementById("ownerPanelBtn")
+.addEventListener("click",()=>{
+
+    if(!isOwner())return;
+
+    document
+    .getElementById("ownerModal")
+    .classList.remove("hidden");
+
+    document
+    .getElementById("ownerModal")
+    .classList.add("flex");
+
+});
+
+
+document.getElementById("closeOwnerModal")
+.addEventListener("click",closeOwnerModal);
+
+
+function closeOwnerModal(){
+
+    document
+    .getElementById("ownerModal")
+    .classList.add("hidden");
+
+    document
+    .getElementById("ownerModal")
+    .classList.remove("flex");
+
+}
+
+
+/* =========================================================
+ OWNER RESET
+========================================================= */
+
+document.getElementById("ownerResetBtn")
+.addEventListener("click",()=>{
+
+    if(!isOwner())return;
+
+
+    const confirmReset=
+    confirm(
+        "OWNER ACTION:\n\n" +
+        "This will delete all members, messages, " +
+        "private chats and media from this browser.\n\n" +
+        "Continue?"
+    );
+
+
+    if(!confirmReset)return;
+
+
+    Object.values(STORAGE)
+    .forEach(key=>{
+        localStorage.removeItem(key);
+    });
+
+
+    location.reload();
+
+});
+
+
+/* =========================================================
+ PROFILE
+========================================================= */
+
+document.getElementById("profileBtn")
+.addEventListener("click",()=>{
+
+    showSection("friends");
+
+});
+
+
+/* =========================================================
+ MEDIA PREVIEW
+========================================================= */
+
+function openMediaPreview(src,type){
+
+    const modal=
+    document.createElement("div");
+
+    modal.className=
+    "fixed inset-0 z-[500] bg-black/95 " +
+    "flex items-center justify-center p-4";
+
+
+    if(type==="image"){
+
+        modal.innerHTML=`
+
+        <img src="${src}"
+        class="max-w-full max-h-full object-contain rounded-xl">
+
+        `;
+
+    }else{
+
+        modal.innerHTML=`
+
+        <video src="${src}"
+        controls autoplay
+        class="max-w-full max-h-full rounded-xl">
+        </video>
+
+        `;
+
+    }
+
+
+    modal.onclick=()=>modal.remove();
+
+    document.body.appendChild(modal);
+
+}
+
+
+/* =========================================================
+ OWNER / MEMBER PROTECTION
+========================================================= */
+
+/*
+    IMPORTANT APPLICATION RULES:
+
+    1. Normal members have NO reset button.
+    2. Normal members cannot delete members.
+    3. Normal members cannot delete another member's message.
+    4. A message can only be deleted by its sender.
+    5. Registration is not shown again when the current
+       saved member exists.
+    6. Private chat has a unique pair key.
+    7. Data persists through localStorage.
+*/
+
+
+/* =========================================================
+ PREVENT ACCIDENTAL DOUBLE REGISTRATION
+========================================================= */
+
+window.addEventListener("beforeunload",()=>{
+
+    if(currentUser){
+        localStorage.setItem(
+            STORAGE.currentUser,
+            JSON.stringify(currentUser)
+        );
+    }
+
+});
+
+
+/* =========================================================
+ ESCAPE HTML
+========================================================= */
+
+function escapeHTML(value){
+
+    return String(value ?? "")
+    .replace(/[&<>"']/g,char=>{
+
+        const map={
+
+            "&":"&amp;",
+            "<":"&lt;",
+            ">":"&gt;",
+            '"':"&quot;",
+            "'":"&#039;"
+
+        };
+
+        return map[char];
+
+    });
+
+}
+
+</script>
+
+</body>
+</html>
